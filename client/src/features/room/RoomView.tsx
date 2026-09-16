@@ -8,7 +8,7 @@ import { CameraPreview } from '../media/CameraPreview';
 import { useWebRTC, RemoteVideo } from '../webrtc';
 import { useCapture } from '../capture';
 import { PhotoEditor } from '../capture/PhotoEditor';
-import { buildPolaroid } from '../capture/polaroid';
+import { PolaroidStudio } from '../capture/PolaroidStudio';
 import { playTick, playShutter } from '../capture/sounds';
 import { copyImageToClipboard, shareImage } from '../capture/share';
 import { canvasFilterFor, PHOTO_FILTERS } from '../capture/filters';
@@ -190,8 +190,6 @@ export const RoomView: React.FC = () => {
     setEditedSingle(null);
     setEditedBurst({});
     setEditedCollage(null);
-    setPolaroidSingle(null);
-    setPolaroidBurst(null);
     retake();
   };
 
@@ -199,10 +197,8 @@ export const RoomView: React.FC = () => {
   const displayBurstSrc = editedBurst[selectedGalleryIndex] ?? burstImages[selectedGalleryIndex];
   const displayCollage = editedCollage ?? collageImage;
 
-  // Extra feature 3: polaroid export (local, wabi-sabi)
-  const [polaroidSingle, setPolaroidSingle] = useState<string | null>(null);
-  const [polaroidBurst, setPolaroidBurst] = useState<string | null>(null);
-  const [polaroidCaption, setPolaroidCaption] = useState('Candid · wabi-sabi');
+  // Polaroid studio caption (shared across single + burst)
+  const [polaroidCaption, setPolaroidCaption] = useState('Candid');
   const [seasonalFrame, setSeasonalFrame] = useState<SeasonalFrameId>('none');
   // Creative extras (all optional, off by default)
   const [showPrompt, setShowPrompt] = useState(false);
@@ -679,18 +675,22 @@ export const RoomView: React.FC = () => {
               {captureState === 'result' && composedImage && (
                 <div className="space-y-6 animate-in">
                   <h3 className="text-heading-md font-semibold text-surface-900 text-center">Your Candid Photo</h3>
-                  <div className="relative w-full max-w-lg mx-auto aspect-square bg-surface-900 rounded-xl overflow-hidden shadow-lg border border-surface-700/30">
-                    <img
-                      src={displaySingle!}
-                      alt="Your Candid photo - two participants side by side with Candid branding"
-                      className="w-full h-full object-cover"
+                  {displaySingle && (
+                    <PolaroidStudio
+                      photoSrc={displaySingle}
+                      filenameBase="candid-photo"
+                      seasonalId={seasonalFrame}
+                      caption={polaroidCaption}
+                      onCaptionChange={setPolaroidCaption}
+                      washiColor={washiColor}
+                      note={flashNote}
+                      baseFilter={filter}
                     />
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  )}
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-lg mx-auto">
                     <button
                       onClick={() => {
-                        setPolaroidSingle(null);
-                        retake();
+                        handleRetakeAll();
                       }}
                       className="btn-secondary btn-lg flex-1"
                       title="Shortcut: R"
@@ -710,40 +710,8 @@ export const RoomView: React.FC = () => {
                     >
                       ✎ Edit
                     </button>
-                    <a
-                      href={displaySingle!}
-                      download="candid-photo.jpg"
-                      className="btn-success btn-lg flex-1 flex items-center justify-center gap-2"
-                      title="Shortcut: D"
-                      aria-keyshortcuts="d"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
-                      Download <kbd className="ml-1 hidden sm:inline-flex items-center px-1 py-0.5 rounded border border-white/30 bg-white/20 text-[10px] font-mono">D</kbd>
-                    </a>
                   </div>
                   <p className="text-[11px] text-ink-500 text-center">Shortcuts: <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">R</kbd> retake · <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">D</kbd> download · <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">Esc</kbd> leave</p>
-                  <div className="flex gap-2 justify-center">
-                    <button
-                      onClick={async () => {
-                        const r = await shareImage(displaySingle!, 'candid-photo.jpg', 'Candid');
-                        flashNote(r === 'shared' ? 'Shared ✓' : r === 'copied' ? 'Copied to clipboard ✓' : 'Download instead');
-                      }}
-                      className="btn-ghost btn-sm border border-surface-200"
-                    >
-                      Share
-                    </button>
-                    <button
-                      onClick={async () => {
-                        const ok = await copyImageToClipboard(displaySingle!);
-                        flashNote(ok ? 'Copied image ✓' : 'Copy failed — try Download');
-                      }}
-                      className="btn-ghost btn-sm border border-surface-200"
-                    >
-                      Copy image
-                    </button>
-                  </div>
                   <div className="flex flex-wrap gap-2 justify-center pt-3 border-t border-paper-border/50">
                     <button onClick={()=>setDoodleTarget(displaySingle!)} className="btn-ghost btn-sm border border-paper-border text-xs">✏️ Doodle (extra)</button>
                     <button onClick={()=>setStickerTarget(displaySingle!)} className="btn-ghost btn-sm border border-paper-border text-xs">⭐ Stickers (extra)</button>
@@ -755,71 +723,12 @@ export const RoomView: React.FC = () => {
                     <span className="flex items-center gap-1 text-xs text-ink-500">Washi<span style={{background:washiColor} as any} className="w-4 h-4 rounded-full border border-paper-border inline-block" /></span>
                   </div>
                   {shareNote && <p className="text-caption text-center text-surface-500">{shareNote}</p>}
-                  <div className="pt-4 border-t border-surface-200 space-y-3">
-                    <p className="text-body-sm font-medium text-surface-700 text-center">Polaroid — wabi strip {seasonalFrame!=='none' ? `· ${seasonalFrame}`:''} <span className="text-xs text-ink-500">(extra: {washiColor})</span></p>
-                    <input
-                      value={polaroidCaption}
-                      onChange={(e) => setPolaroidCaption(e.target.value)}
-                      placeholder="Caption"
-                      maxLength={24}
-                      className="input text-center"
-                    />
-                    <button
-                      onClick={async () => {
-                        const p = await buildPolaroid(displaySingle!, polaroidCaption || 'Candid · wabi-sabi', seasonalFrame);
-                        setPolaroidSingle(p);
-                      }}
-                      className="btn-secondary btn-md w-full"
-                    >
-                      Make Polaroid {seasonalFrame !== 'none' ? `· ${seasonalFrame}` : ''}
-                    </button>
-                    {polaroidSingle && (
-                      <div className="space-y-3 animate-in">
-                        <div className="relative w-full max-w-sm mx-auto rounded-xl overflow-hidden shadow border border-surface-200 bg-white">
-                          <img src={polaroidSingle} alt="Polaroid preview" className="w-full h-auto" />
-                        </div>
-                        <a href={polaroidSingle} download="candid-polaroid.jpg" className="btn-success btn-md w-full flex items-center justify-center gap-2">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                          </svg>
-                          Download Polaroid
-                        </a>
-                        <div className="flex gap-2 justify-center">
-                          <button
-                            onClick={async () => {
-                              const r = await shareImage(polaroidSingle!, 'candid-polaroid.jpg', 'Candid polaroid');
-                              flashNote(r === 'shared' ? 'Shared ✓' : r === 'copied' ? 'Copied ✓' : 'Download instead');
-                            }}
-                            className="btn-ghost btn-sm border border-surface-200"
-                          >
-                            Share polaroid
-                          </button>
-                          <button
-                            onClick={async () => {
-                              const ok = await copyImageToClipboard(polaroidSingle!);
-                              flashNote(ok ? 'Copied ✓' : 'Copy failed');
-                            }}
-                            className="btn-ghost btn-sm border border-surface-200"
-                          >
-                            Copy image
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 </div>
               )}
 
               {captureState === 'gallery' && burstImages.length > 0 && (
                 <div className="space-y-6 animate-in">
                   <h3 className="text-heading-md font-semibold text-surface-900 text-center">Pick your favorite</h3>
-                  <div className="relative w-full max-w-lg mx-auto aspect-square bg-surface-900 rounded-xl overflow-hidden shadow-lg border border-surface-700/30">
-                    <img
-                      src={displayBurstSrc}
-                      alt={`Burst shot ${selectedGalleryIndex + 1} of ${burstImages.length}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
                   <div className="grid grid-cols-3 gap-3 max-w-lg mx-auto" role="radiogroup" aria-label="Burst shots">
                     {burstImages.map((img, i) => (
                       <button
@@ -839,7 +748,20 @@ export const RoomView: React.FC = () => {
                       </button>
                     ))}
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  {displayBurstSrc && (
+                    <PolaroidStudio
+                      key={selectedGalleryIndex}
+                      photoSrc={displayBurstSrc}
+                      filenameBase={`candid-burst-${selectedGalleryIndex + 1}`}
+                      seasonalId={seasonalFrame}
+                      caption={polaroidCaption}
+                      onCaptionChange={setPolaroidCaption}
+                      washiColor={washiColor}
+                      note={flashNote}
+                      baseFilter={filter}
+                    />
+                  )}
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-lg mx-auto">
                     <button onClick={handleRetakeAll} className="btn-secondary btn-lg flex-1" title="Shortcut: R" aria-keyshortcuts="r">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -855,93 +777,8 @@ export const RoomView: React.FC = () => {
                     >
                       ✎ Edit
                     </button>
-                    <a
-                      href={displayBurstSrc}
-                      download={`candid-burst-${selectedGalleryIndex + 1}.jpg`}
-                      className="btn-success btn-lg flex-1 flex items-center justify-center gap-2"
-                      title="Shortcut: D"
-                      aria-keyshortcuts="d"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
-                      Download <kbd className="ml-1 hidden sm:inline-flex items-center px-1 py-0.5 rounded border border-white/30 bg-white/20 text-[10px] font-mono">D</kbd>
-                    </a>
                   </div>
                   <p className="text-[11px] text-ink-500 text-center">Shortcuts: <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">R</kbd> new burst · <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">D</kbd> download · <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">Esc</kbd> leave</p>
-                  <div className="flex gap-2 justify-center">
-                    <button
-                      onClick={async () => {
-                        const r = await shareImage(displayBurstSrc, `candid-burst-${selectedGalleryIndex + 1}.jpg`, 'Candid burst');
-                        flashNote(r === 'shared' ? 'Shared ✓' : r === 'copied' ? 'Copied ✓' : 'Download instead');
-                      }}
-                      className="btn-ghost btn-sm border border-surface-200"
-                    >
-                      Share
-                    </button>
-                    <button
-                      onClick={async () => {
-                        const ok = await copyImageToClipboard(displayBurstSrc);
-                        flashNote(ok ? 'Copied image ✓' : 'Copy failed');
-                      }}
-                      className="btn-ghost btn-sm border border-surface-200"
-                    >
-                      Copy image
-                    </button>
-                  </div>
-
-                  <div className="pt-4 border-t border-surface-200 space-y-3">
-                    <p className="text-body-sm font-medium text-surface-700 text-center">Polaroid — single pick</p>
-                    <input
-                      value={polaroidCaption}
-                      onChange={(e) => setPolaroidCaption(e.target.value)}
-                      placeholder="Caption"
-                      maxLength={24}
-                      className="input text-center"
-                    />
-                    <button
-                      onClick={async () => {
-                        const p = await buildPolaroid(displayBurstSrc, polaroidCaption || 'Candid · wabi-sabi', seasonalFrame);
-                        setPolaroidBurst(p);
-                      }}
-                      className="btn-secondary btn-md w-full"
-                    >
-                      Make Polaroid {seasonalFrame !== 'none' ? `· ${seasonalFrame}` : ''}
-                    </button>
-                    {polaroidBurst && (
-                      <div className="space-y-3 animate-in">
-                        <div className="relative w-full max-w-sm mx-auto rounded-xl overflow-hidden shadow border border-surface-200 bg-white">
-                          <img src={polaroidBurst} alt="Polaroid preview" className="w-full h-auto" />
-                        </div>
-                        <a href={polaroidBurst} download="candid-polaroid-burst.jpg" className="btn-success btn-md w-full flex items-center justify-center gap-2">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                          </svg>
-                          Download Polaroid
-                        </a>
-                        <div className="flex gap-2 justify-center">
-                          <button
-                            onClick={async () => {
-                              const r = await shareImage(polaroidBurst!, 'candid-polaroid-burst.jpg', 'Candid polaroid');
-                              flashNote(r === 'shared' ? 'Shared ✓' : r === 'copied' ? 'Copied ✓' : 'Download instead');
-                            }}
-                            className="btn-ghost btn-sm border border-surface-200"
-                          >
-                            Share polaroid
-                          </button>
-                          <button
-                            onClick={async () => {
-                              const ok = await copyImageToClipboard(polaroidBurst!);
-                              flashNote(ok ? 'Copied ✓' : 'Copy failed');
-                            }}
-                            className="btn-ghost btn-sm border border-surface-200"
-                          >
-                            Copy image
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
 
                   {/* Collage builder — wabi-sabi extra */}
                   <div className="pt-6 border-t border-surface-200 space-y-4">
