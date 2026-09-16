@@ -69,7 +69,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (isThemeId(stored)) return stored;
-    } catch {}
+    } catch (_e) {
+      void _e;
+    }
     // Respect prefers-color-scheme for kintsugi hint, but default to sabi
     return DEFAULT_THEME;
   });
@@ -79,7 +81,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setThemeState(id);
     try {
       localStorage.setItem(STORAGE_KEY, id);
-    } catch {}
+    } catch (_e) {
+      void _e;
+    }
   }, []);
 
   useEffect(() => {
