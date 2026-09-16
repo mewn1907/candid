@@ -20,16 +20,18 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 export async function buildCollage(
   dataUrls: string[],
   layout: CollageLayout = 'strip',
+  seasonalId: import('./seasonal').SeasonalFrameId = 'none',
 ): Promise<string> {
   if (dataUrls.length === 0) throw new Error('No images for collage');
+  const { seasonalFor } = await import('./seasonal');
+  const seasonal = seasonalFor(seasonalId);
   const images = await Promise.all(dataUrls.map(loadImage));
 
-  // Normalize: target strip width; wabi palette
   const OUTER_PAD = 28;
   const GAP = 16;
-  const BG = '#fafaf9'; // surface-50 / wabi paper
-  const CAPTION_BG = '#f5f0e8'; // wabi-100
-  const TEXT = '#292524';
+  const BG = seasonal.bg;
+  const CAPTION_BG = seasonal.captionBg;
+  const TEXT = seasonal.accent === '#fafaf9' ? '#292524' : '#292524';
 
   if (layout === 'strip') {
     const TARGET_W = 900;

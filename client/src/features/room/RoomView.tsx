@@ -12,6 +12,8 @@ import { buildPolaroid } from '../capture/polaroid';
 import { playTick, playShutter } from '../capture/sounds';
 import { copyImageToClipboard, shareImage } from '../capture/share';
 import { canvasFilterFor, PHOTO_FILTERS } from '../capture/filters';
+import { SeasonalSelector } from '../capture/SeasonalSelector';
+import { SeasonalFrameId } from '../capture/seasonal';
 
 export const RoomView: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -190,6 +192,7 @@ export const RoomView: React.FC = () => {
   const [polaroidSingle, setPolaroidSingle] = useState<string | null>(null);
   const [polaroidBurst, setPolaroidBurst] = useState<string | null>(null);
   const [polaroidCaption, setPolaroidCaption] = useState('Candid · wabi-sabi');
+  const [seasonalFrame, setSeasonalFrame] = useState<SeasonalFrameId>('none');
 
   // Extra feature 5: share polish
   const [shareNote, setShareNote] = useState<string | null>(null);
@@ -547,12 +550,12 @@ export const RoomView: React.FC = () => {
                     />
                     <button
                       onClick={async () => {
-                        const p = await buildPolaroid(displaySingle!, polaroidCaption || 'Candid · wabi-sabi');
+                        const p = await buildPolaroid(displaySingle!, polaroidCaption || 'Candid · wabi-sabi', seasonalFrame);
                         setPolaroidSingle(p);
                       }}
                       className="btn-secondary btn-md w-full"
                     >
-                      Make Polaroid
+                      Make Polaroid {seasonalFrame !== 'none' ? `· ${seasonalFrame}` : ''}
                     </button>
                     {polaroidSingle && (
                       <div className="space-y-3 animate-in">
@@ -679,12 +682,12 @@ export const RoomView: React.FC = () => {
                     />
                     <button
                       onClick={async () => {
-                        const p = await buildPolaroid(displayBurstSrc, polaroidCaption || 'Candid · wabi-sabi');
+                        const p = await buildPolaroid(displayBurstSrc, polaroidCaption || 'Candid · wabi-sabi', seasonalFrame);
                         setPolaroidBurst(p);
                       }}
                       className="btn-secondary btn-md w-full"
                     >
-                      Make Polaroid
+                      Make Polaroid {seasonalFrame !== 'none' ? `· ${seasonalFrame}` : ''}
                     </button>
                     {polaroidBurst && (
                       <div className="space-y-3 animate-in">
@@ -744,13 +747,13 @@ export const RoomView: React.FC = () => {
                       ))}
                     </div>
                     <button
-                      onClick={() => createCollage(collageChoice)}
+                      onClick={() => createCollage(collageChoice, seasonalFrame)}
                       className="btn-primary btn-lg w-full max-w-lg mx-auto"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      Create Collage — {collageChoice === 'strip' ? 'Strip' : 'Grid'}
+                      Create Collage — {collageChoice === 'strip' ? 'Strip' : 'Grid'} {seasonalFrame !== 'none' ? `· ${seasonalFrame}` : ''}
                     </button>
 
                     {collageImage && (
@@ -831,8 +834,8 @@ export const RoomView: React.FC = () => {
                       </button>
                     ))}
                   </div>
-                  <button onClick={() => createCollage(collageChoice)} className="btn-primary btn-lg w-full max-w-lg mx-auto">
-                    Create Collage — {collageChoice === 'strip' ? 'Strip' : 'Grid'}
+                  <button onClick={() => createCollage(collageChoice, seasonalFrame)} className="btn-primary btn-lg w-full max-w-lg mx-auto">
+                    Create Collage — {collageChoice === 'strip' ? 'Strip' : 'Grid'} {seasonalFrame !== 'none' ? `· ${seasonalFrame}` : ''}
                   </button>
                   {collageImage && (
                     <div className="relative w-full max-w-lg mx-auto rounded-xl overflow-hidden shadow border border-surface-200 bg-white">
@@ -893,6 +896,7 @@ export const RoomView: React.FC = () => {
               {captureState === 'idle' && (
                 <div className="pt-4 animate-in space-y-6">
                   <FilterSelector selected={filter} onSelect={setFilter} />
+                  <SeasonalSelector selected={seasonalFrame} onSelect={setSeasonalFrame} />
                   <div className="animate-in">
                     <p className="text-body-sm font-medium text-surface-700 mb-3 text-center">Shots</p>
                     <div className="flex items-center justify-center gap-2" role="radiogroup" aria-label="Number of shots">

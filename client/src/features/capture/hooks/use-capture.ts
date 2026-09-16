@@ -48,7 +48,7 @@ export function useCapture(
   burstImages: string[];
   collageImage: string | null;
   collageLayout: CollageLayout;
-  createCollage: (layout?: CollageLayout) => Promise<void>;
+  createCollage: (layout?: CollageLayout, seasonalId?: import('../seasonal').SeasonalFrameId) => Promise<void>;
   cleanupCapture: () => void;
 } {
   const [state, setState] = useState<CaptureState>('idle');
@@ -452,11 +452,11 @@ export function useCapture(
     }
   }, [state, transitionTo]);
 
-  const createCollage = useCallback(async (layout: CollageLayout = collageLayout) => {
+  const createCollage = useCallback(async (layout: CollageLayout = collageLayout, seasonalId: import('../seasonal').SeasonalFrameId = 'none') => {
     if (burstImages.length === 0) return;
     setCollageLayout(layout);
     try {
-      const collage = await buildCollage(burstImages, layout);
+      const collage = await buildCollage(burstImages, layout, seasonalId);
       setCollageImage(collage);
     } catch (err) {
       console.error('[Capture] collage failed', err);
