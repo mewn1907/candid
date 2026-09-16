@@ -1,5 +1,6 @@
 // ©️ Mewn — Cozy Wabi-Sabi (Stitch)
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ThemeSwitcher } from '../theme';
 import { StarsBackground } from './StarsBackground';
 
@@ -38,7 +39,13 @@ export const LandingPage: React.FC = () => {
         <p className="text-lg sm:text-xl text-ink-700 max-w-xl font-normal leading-relaxed mb-10 animate-slide-up" style={{ animationDelay: '150ms' as any }}>
           A cozy virtual photobooth built for two. Share a room link, line up your shot, sync your countdown, and capture fun polaroids together — from anywhere.
         </p>
-
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full max-w-md mb-16 animate-slide-up" style={{ animationDelay: '250ms' as any }}>
+          <Link to="/create" className="btn-primary w-full sm:w-auto flex-1 text-base group">
+            <span>Create a Room</span>
+            <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+          </Link>
+          <Link to="/join" className="btn-secondary w-full sm:w-auto flex-1 text-base">Join with Code</Link>
+        </div>
 
         <div className="relative w-full max-w-2xl h-80 sm:h-96 my-4 flex items-center justify-center">
           <div className="absolute left-4 sm:left-12 top-6 w-52 sm:w-64 polaroid-frame animate-drift-slow z-10">
