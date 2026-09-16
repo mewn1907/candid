@@ -40,39 +40,32 @@ export const LandingPage: React.FC = () => {
         </p>
 
 
-        <div className="relative w-full max-w-xl mx-auto my-6 flex items-center justify-center">
-          <div className="w-full max-w-[560px] polaroid-frame animate-drift-slow p-3 sm:p-4 pb-10">
+        <div className="relative w-full max-w-2xl h-80 sm:h-96 my-4 flex items-center justify-center">
+          <div className="absolute left-4 sm:left-12 top-6 w-52 sm:w-64 polaroid-frame animate-drift-slow z-10">
             <div className="washi-tape" />
-            {/* Together frame — one shutter, one photo, two cities */}
-            <div className="relative bg-white rounded-organic-sm overflow-hidden shadow-inner border border-paper-200">
-              <div className="bg-ink-900 text-cream text-center py-2">
-                <span className="font-mono text-[11px] tracking-[0.2em] font-light">CANDID</span>
-                <span className="mx-2 text-ink-400">·</span>
-                <span className="font-mono text-[10px] text-cream/80">3 · 2 · 1</span>
-              </div>
-              <div className="relative grid grid-cols-2 gap-0">
-                <div className="relative aspect-[4/3] bg-gradient-to-br from-clay/25 via-paper-100 to-cream flex flex-col items-center justify-center p-3 border-r border-paper-200">
-                  <div className="w-11 h-11 rounded-full bg-cream border border-paper-border flex items-center justify-center shadow-sm text-clay font-mono text-xs">YOU</div>
-                  <span className="mt-1.5 text-[10px] font-mono text-ink-700">PARIS</span>
-                  <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/45 text-white font-mono text-[8px] backdrop-blur-sm">11:42 PM</span>
-                  <span className="absolute top-2 left-2 w-1.5 h-1.5 rounded-full bg-clay animate-pulse-soft" aria-hidden="true" />
+            <div className="aspect-[4/3] bg-paper-300 rounded overflow-hidden relative shadow-inner">
+              <div className="w-full h-full bg-gradient-to-tr from-clay/30 via-paper-200 to-cream flex items-center justify-center">
+                <div className="text-center p-3">
+                  <div className="w-12 h-12 rounded-full bg-cream mx-auto mb-2 flex items-center justify-center shadow-sm text-clay font-mono text-sm">YOU</div>
+                  <p className="text-xs text-ink-700 font-mono">Room Creator</p>
                 </div>
-                <div className="relative aspect-[4/3] bg-gradient-to-bl from-pine/20 via-paper-100 to-cream flex flex-col items-center justify-center p-3">
-                  <div className="w-11 h-11 rounded-full bg-cream border border-paper-border flex items-center justify-center shadow-sm text-pine font-mono text-xs">THEM</div>
-                  <span className="mt-1.5 text-[10px] font-mono text-ink-700">TOKYO</span>
-                  <span className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/45 text-white font-mono text-[8px] backdrop-blur-sm">06:42 AM</span>
-                  <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-pine animate-pulse-soft" aria-hidden="true" />
-                </div>
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white border border-paper-border shadow-sm flex items-center justify-center text-[10px] z-10">♥︎</div>
               </div>
-              <div className="bg-ink-900 text-cream/90 text-center py-2.5 flex items-center justify-center gap-2">
-                <span className="font-mono text-[10px] tracking-wider">©️ Mewn</span>
-                <span className="w-1 h-1 rounded-full bg-cream/60" />
-                <span className="font-handwritten text-sm leading-none opacity-90">Frames together</span>
-              </div>
+              <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/40 text-white font-mono text-[10px] backdrop-blur-sm">PARIS • 11:42 PM</div>
             </div>
-            <p className="font-handwritten text-lg text-ink-700 text-center mt-3">“One shutter, two cities — one frame.”</p>
-            <p className="text-[11px] text-ink-500 text-center mt-1">Real result: two live cameras composed side-by-side, not two solos</p>
+            <p className="font-handwritten text-lg text-ink-700 text-center mt-3">"Wish you were sitting right here"</p>
+          </div>
+          <div className="absolute right-4 sm:right-12 top-12 w-52 sm:w-64 polaroid-frame animate-drift-alt z-20">
+            <div className="washi-tape !rotate-[2deg] !bg-pine-light/40" />
+            <div className="aspect-[4/3] bg-paper-300 rounded overflow-hidden relative shadow-inner">
+              <div className="w-full h-full bg-gradient-to-tl from-pine/25 via-paper-200 to-cream flex items-center justify-center">
+                <div className="text-center p-3">
+                  <div className="w-12 h-12 rounded-full bg-cream mx-auto mb-2 flex items-center justify-center shadow-sm text-pine font-mono text-sm">THEM</div>
+                  <p className="text-xs text-ink-700 font-mono">Connected Peer</p>
+                </div>
+              </div>
+              <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/40 text-white font-mono text-[10px] backdrop-blur-sm">TOKYO • 06:42 AM</div>
+            </div>
+            <p className="font-handwritten text-lg text-ink-700 text-center mt-3">"Frames together forever."</p>
           </div>
         </div>
 
