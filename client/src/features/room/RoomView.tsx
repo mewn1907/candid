@@ -402,7 +402,8 @@ export const RoomView: React.FC = () => {
 
   // Extract countdown display value to satisfy TypeScript type narrowing in JSX
   const countdownDisplay = countdown !== null && countdown > 0 ? countdown : null;
-  const waitingRoomId = isWaiting ? currentRoom?.id ?? null : null;
+  const waitingRoomId = isWaiting ? (currentRoom?.id ?? roomId ?? null) : null;
+  const displayRoomId = currentRoom?.id ?? roomId ?? '—';
   const burstProgress =
     burstPlan && burstPlan.total > 1
       ? `Shot ${Math.min(burstPlan.index, burstPlan.total)} of ${burstPlan.total}`
@@ -476,9 +477,9 @@ export const RoomView: React.FC = () => {
       <header className="max-w-4xl w-full mb-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-center flex-1 w-full sm:w-auto">
-            <h1 className="text-display-sm font-light text-surface-900 tracking-tight break-all">Room: <span className="text-wabi-700">{currentRoom?.id}</span></h1>
+            <h1 className="text-display-sm font-light text-surface-900 tracking-tight break-all">Room: <span className="text-wabi-700">{displayRoomId}</span></h1>
             <p className="mt-1 text-body-md text-surface-600">
-              Your participant ID: <span className="font-mono font-semibold text-wabi-700">{currentParticipantId}</span>
+              Your participant ID: <span className="font-mono font-semibold text-wabi-700">{currentParticipantId ?? '…'}</span>
             </p>
             <div className="flex sm:hidden justify-center mt-3">
               <ThemeSwitcher compact />
@@ -526,7 +527,7 @@ export const RoomView: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={async () => {
-                        const ok = await copyText(currentRoom?.id ?? '');
+                        const ok = await copyText(displayRoomId);
                         if (ok) {
                           setRoomIdCopied(true);
                           setTimeout(() => setRoomIdCopied(false), 2000);
@@ -542,11 +543,11 @@ export const RoomView: React.FC = () => {
                     {typeof navigator.share === 'function' && (
                       <button
                         onClick={async () => {
-                          const link = `${window.location.origin}/join/${currentRoom?.id ?? ''}`;
+                          const link = `${window.location.origin}/join/${displayRoomId}`;
                           try {
                             await (navigator as unknown as { share: (d: ShareData) => Promise<void> }).share({
                               title: 'Join my Candid room',
-                              text: `Join room ${currentRoom?.id}`,
+                              text: `Join room ${displayRoomId}`,
                               url: link,
                             });
                           } catch {
@@ -561,7 +562,7 @@ export const RoomView: React.FC = () => {
                   </div>
                 </div>
                 <code className="text-heading-md font-mono tracking-widest text-surface-900 bg-white px-4 py-3 rounded-lg border border-surface-200 block w-full text-center select-all">
-                  {currentRoom?.id}
+                  {displayRoomId}
                 </code>
                 {shareNote && <p className="text-caption text-center text-surface-500 mt-3" aria-live="polite">{shareNote}</p>}
               </div>
