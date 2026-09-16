@@ -19,6 +19,9 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
         <nav className="flex items-center gap-3">
+          <div className="hidden sm:flex">
+            <ThemeSwitcher compact />
+          </div>
           <Link to="/join" className="btn-ghost text-sm font-medium">Enter Code</Link>
           <Link to="/create" className="btn-primary text-sm py-2.5 px-5">Start Booth</Link>
         </nav>
@@ -97,9 +100,6 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="w-full max-w-2xl mt-10">
-          <ThemeSwitcher />
-        </div>
       </main>
       <footer className="relative z-10 w-full border-t border-paper-border py-6 px-6 bg-paper-50/60 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-ink-500 gap-3">
