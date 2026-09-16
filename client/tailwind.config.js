@@ -1,0 +1,1 @@
+tailwindcss ./src/index.css -o ./src/output.css --minify

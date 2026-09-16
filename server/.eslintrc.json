@@ -1,0 +1,30 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:node/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint", "node"],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/explicit-module-boundary-types": "error",
+    "@typescript-eslint/no-unused-vars": "error",
+    "node/no-unpublished-import": "error",
+    "node/no-missing-import": "off"
+  },
+  "ignorePatterns": ["dist/", "node_modules/", "*.d.ts"],
+  "overrides": [
+    {
+      "files": ["*.test.ts"],
+      "rules": {
+        "node/no-unpublished-import": "off"
+      }
+    }
+  ]
+}

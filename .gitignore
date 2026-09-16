@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+server/src/**/*.js
+server/src/**/*.d.ts
+server/src/**/*.js.map
+server/src/**/*.d.ts.map
+
+# Environment
+.env
+
+# Logs & OS
+*.log
+.DS_Store
