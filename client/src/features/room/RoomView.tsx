@@ -636,6 +636,24 @@ export const RoomView: React.FC = () => {
                   filterId={filter}
                 />
               </div>
+              {captureState === 'idle' && (
+                <div className="flex justify-center pt-2">
+                  <button
+                    onClick={handleStartCapture}
+                    disabled={!localStream}
+                    className="btn-primary btn-md sm:btn-lg w-auto min-w-[200px] justify-center"
+                    aria-disabled={!localStream}
+                    aria-keyshortcuts="Space Enter"
+                    title="Start Capture"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span>Start Capture</span>
+                  </button>
+                </div>
+              )}
               {bgBlur && <p className="text-[11px] text-ink-500 text-center">Cozy blur bg enabled (extra)</p>}
               {clipUrl && (
                 <div className="max-w-md mx-auto p-3 bg-paper-50 border border-paper-border rounded-organic text-center">
@@ -1094,25 +1112,6 @@ export const RoomView: React.FC = () => {
 
               {captureState === 'idle' && (
                 <div className="pt-4 animate-in space-y-6">
-                  <div className="flex justify-end">
-                    <button
-                      onClick={handleStartCapture}
-                      disabled={!localStream}
-                      className="btn-primary btn-md sm:btn-lg w-auto"
-                      aria-disabled={!localStream}
-                      aria-keyshortcuts="Space Enter"
-                      title="Shortcut: Space or Enter"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      <span>Start Capture {promptEnabled ? '(extra: prompt)' : ''}</span>
-                      <kbd className="ml-2 hidden sm:inline-flex items-center px-1.5 py-0.5 rounded border border-white/30 bg-white/20 text-[10px] font-mono">Space</kbd>
-                    </button>
-                  </div>
-                  <p className="text-[11px] text-ink-500 text-right -mt-2">Shortcut: <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">Space</kbd> or <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">Enter</kbd> · <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">Esc</kbd> · <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">?</kbd></p>
-                  {promptEnabled && <p className="text-[11px] text-ink-500 text-right -mt-2">Prompt card will show before countdown (extra)</p>}
                   <FilterSelector selected={filter} onSelect={setFilter} />
                   <SeasonalSelector selected={seasonalFrame} onSelect={setSeasonalFrame} />
                   <ThemeSwitcher />
