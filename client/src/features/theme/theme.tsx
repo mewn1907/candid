@@ -114,18 +114,94 @@ export function useTheme(): ThemeContextValue {
 
 export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
   const { theme, setTheme, themes } = useTheme();
-  return (
-    <div className={compact ? 'flex items-center gap-1 sm:gap-1.5 max-w-full' : 'card p-3 sm:p-4 border-paper-border/90 bg-paper-100/95 shadow-cozy animate-in'}>
-      {!compact && (
-        <div className="flex items-center justify-between mb-3 px-1">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-ink-700 uppercase tracking-wider">
-            <span>🎨 Wabi Style</span>
-            <span className="font-normal normal-case text-ink-500">(theme)</span>
-          </div>
-          <span className="text-[11px] font-mono text-ink-500">Live switch</span>
+  const [open, setOpen] = useState(false);
+  const current = themes.find((t) => t.id === theme) ?? themes[0];
+
+  if (compact) {
+    return (
+      <div className="relative">
+        {/* Desktop: inline pills */}
+        <div className="hidden sm:flex items-center gap-1.5 max-w-full">
+          {themes.map((t) => {
+            const active = t.id === theme;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setTheme(t.id)}
+                role="radio"
+                aria-checked={active}
+                aria-label={`${t.label} — ${t.hint}`}
+                title={`${t.label} — ${t.hint}`}
+                className={`flex-shrink-0 flex flex-col items-center gap-1 p-2 rounded-organic-sm transition-all min-w-[60px] ${active ? 'bg-paper-200 ring-2 ring-clay scale-105 shadow-sm' : 'hover:bg-paper-200/50 opacity-80 hover:opacity-100'}`}
+              >
+                <span className={`w-9 h-9 rounded-full border-2 flex items-center justify-center text-sm shadow-inner ${active ? 'border-clay' : 'border-white'}`} style={{ background: t.swatch }} aria-hidden="true">
+                  <span className={active ? '' : 'opacity-80'}>{t.emoji}</span>
+                </span>
+                <span className={`text-[11px] font-medium leading-none ${active ? 'text-ink-900' : 'text-ink-700'}`}>{t.label}</span>
+              </button>
+            );
+          })}
         </div>
-      )}
-      <div className={`flex items-center gap-1 sm:gap-2 overflow-x-auto pb-1 scrollbar-none ${compact ? 'snap-x snap-mandatory' : ''}`} role="radiogroup" aria-label="Wabi style">
+        {/* Mobile: single big pill that opens sheet — no clash with CANDID */}
+        <div className="sm:hidden">
+          <button
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-haspopup="dialog"
+            className="flex items-center gap-2 px-3 py-2 rounded-full bg-paper-200 border border-paper-border shadow-cozy-sm text-ink-700"
+          >
+            <span className="w-7 h-7 rounded-full border border-white shadow-inner flex items-center justify-center text-xs" style={{ background: current.swatch }} aria-hidden="true">
+              {current.emoji}
+            </span>
+            <span className="text-xs font-medium">{current.label}</span>
+            <svg className={`w-3 h-3 text-ink-500 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          {open && (
+            <div className="absolute right-0 mt-2 w-[280px] card p-3 border-paper-border/90 bg-paper-100 shadow-cozy z-50 animate-in" role="dialog" aria-label="Pick wabi style">
+              <div className="flex items-center justify-between mb-2 px-1">
+                <span className="text-xs font-semibold text-ink-700 uppercase tracking-wider">🎨 Wabi Style</span>
+                <button onClick={() => setOpen(false)} className="text-[11px] font-mono text-ink-500 px-2 py-1 rounded-full hover:bg-paper-200">Close</button>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {themes.map((t) => {
+                  const active = t.id === theme;
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => {
+                        setTheme(t.id);
+                        setOpen(false);
+                      }}
+                      role="radio"
+                      aria-checked={active}
+                      className={`flex flex-col items-center gap-1.5 p-2.5 rounded-organic-sm transition-all ${active ? 'bg-paper-200 ring-2 ring-clay shadow-sm' : 'hover:bg-paper-200/60'}`}
+                    >
+                      <span className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-base shadow-inner ${active ? 'border-clay' : 'border-white'}`} style={{ background: t.swatch }} aria-hidden="true">
+                        {t.emoji}
+                      </span>
+                      <span className={`text-xs font-medium ${active ? 'text-ink-900' : 'text-ink-700'}`}>{t.label}</span>
+                      <span className="text-[10px] text-ink-500 text-center leading-tight">{t.hint}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card p-3 sm:p-4 border-paper-border/90 bg-paper-100/95 shadow-cozy animate-in">
+      <div className="flex items-center justify-between mb-3 px-1">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-ink-700 uppercase tracking-wider">
+          <span>🎨 Wabi Style</span>
+          <span className="font-normal normal-case text-ink-500">(theme)</span>
+        </div>
+        <span className="text-[11px] font-mono text-ink-500">Live switch</span>
+      </div>
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none" role="radiogroup" aria-label="Wabi style">
         {themes.map((t) => {
           const active = t.id === theme;
           return (
@@ -136,18 +212,18 @@ export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false
               aria-checked={active}
               aria-label={`${t.label} — ${t.hint}`}
               title={`${t.label} — ${t.hint}`}
-              className={`flex-shrink-0 snap-center flex flex-col items-center gap-0.5 sm:gap-1 p-1.5 sm:p-2 rounded-organic-sm transition-all min-w-[52px] sm:min-w-[60px] ${active ? 'bg-paper-200 ring-2 ring-clay scale-105 shadow-sm' : 'hover:bg-paper-200/50 opacity-80 hover:opacity-100'}`}
+              className={`flex-shrink-0 flex flex-col items-center gap-1 p-2 rounded-organic-sm transition-all ${active ? 'bg-paper-200 ring-2 ring-clay scale-105 shadow-sm' : 'hover:bg-paper-200/50 opacity-80 hover:opacity-100'}`}
             >
-              <span className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 flex items-center justify-center text-xs sm:text-sm shadow-inner ${active ? 'border-clay' : 'border-white'}`} style={{ background: t.swatch }} aria-hidden="true">
+              <span className={`w-9 h-9 rounded-full border-2 flex items-center justify-center text-sm shadow-inner ${active ? 'border-clay' : 'border-white'}`} style={{ background: t.swatch }} aria-hidden="true">
                 <span className={active ? '' : 'opacity-80'}>{t.emoji}</span>
               </span>
-              <span className={`text-[10px] sm:text-[11px] font-medium leading-none ${active ? 'text-ink-900' : 'text-ink-700'}`}>{t.label}</span>
-              {!compact && <span className="text-[9px] text-ink-500 leading-none hidden sm:inline">{t.hint}</span>}
+              <span className={`text-[11px] font-medium ${active ? 'text-ink-900' : 'text-ink-700'}`}>{t.label}</span>
+              <span className="text-[9px] text-ink-500 leading-none hidden sm:inline">{t.hint}</span>
             </button>
           );
         })}
       </div>
-      {!compact && <p className="text-[11px] text-ink-500 text-center mt-2">Current: <span className="font-medium text-ink-700">{themes.find((t) => t.id === theme)?.label}</span> — {themes.find((t) => t.id === theme)?.hint} · saved to localStorage</p>}
+      <p className="text-[11px] text-ink-500 text-center mt-2">Current: <span className="font-medium text-ink-700">{themes.find((t) => t.id === theme)?.label}</span> — {themes.find((t) => t.id === theme)?.hint} · saved to localStorage</p>
     </div>
   );
 };

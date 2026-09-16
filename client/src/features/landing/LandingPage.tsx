@@ -11,22 +11,17 @@ export const LandingPage: React.FC = () => {
       <div className="absolute top-[-10%] left-[-10%] w-[45vw] h-[45vw] bg-clay-light/20 rounded-full blur-3xl pointer-events-none animate-pulse-soft" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-pine-light/15 rounded-full blur-3xl pointer-events-none" />
       <header className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-organic-sm bg-clay flex items-center justify-center text-cream shadow-cozy-sm rotate-[-2deg]">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-            </div>
-            <div>
-              <span className="font-display font-light text-xl sm:text-2xl tracking-tight text-ink-900">Candid</span>
-              <span className="ml-2 inline-block w-2 h-2 rounded-full bg-clay animate-ping" />
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-organic-sm bg-clay flex items-center justify-center text-cream shadow-cozy-sm rotate-[-2deg]">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
           </div>
-          <div className="sm:hidden flex items-center gap-1.5 text-[10px] font-mono text-ink-500 bg-paper-200/70 px-2 py-1 rounded-full border border-paper-border">🎨 Theme</div>
+          <div>
+            <span className="font-mono font-light text-xl sm:text-2xl tracking-[0.28em] text-ink-900 uppercase bg-gradient-to-br from-clay via-ink-700 to-pine bg-clip-text text-transparent">CANDID</span>
+            <span className="ml-2 inline-block w-2 h-2 rounded-full bg-clay animate-ping" />
+          </div>
         </div>
-        <nav className="flex items-center gap-3 justify-center sm:justify-end w-full sm:w-auto overflow-hidden">
-          <div className="flex max-w-full overflow-x-auto scrollbar-none">
-            <ThemeSwitcher compact />
-          </div>
+        <nav className="flex items-center justify-center sm:justify-end w-full sm:w-auto">
+          <ThemeSwitcher compact />
         </nav>
       </header>
 
