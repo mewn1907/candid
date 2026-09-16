@@ -268,33 +268,33 @@ export function useWebRTC(
   }, [socket, currentRoomId, localParticipantId, localStream, createPeerConnection]);
 
   useEffect(() => {
-    const ws = socketRef.current;
-    if (!ws || !peerConnectionRef.current) return;
+    const ws = socket;
+    const pc = peerConnectionRef.current;
+    if (!ws || !pc) return;
 
     const handleOffer = async (data: { from: ParticipantId; offer: RTCSessionDescriptionInit }) => {
       if (data.from === localParticipantIdRef.current) return;
-      const pc = peerConnectionRef.current;
-      if (!pc) return;
+      const curPc = peerConnectionRef.current;
+      if (!curPc) return;
 
       try {
-        await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
+        await curPc.setRemoteDescription(new RTCSessionDescription(data.offer));
+        const answer = await curPc.createAnswer();
+        await curPc.setLocalDescription(answer);
 
-        const ws2 = socketRef.current;
         const currentRoomId = currentRoomIdRef.current;
-        if (ws2 && currentRoomId) {
-          ws2.emit('webrtc:answer', {
+        if (currentRoomId) {
+          ws.emit('webrtc:answer', {
             roomId: currentRoomId,
             to: data.from,
-            answer: pc.localDescription!.toJSON(),
+            answer: curPc.localDescription!.toJSON(),
           } as WebRTCAnswerPayload);
         }
 
         while (pendingCandidatesRef.current.length > 0) {
           const candidate = pendingCandidatesRef.current.shift();
           if (candidate) {
-            await pc.addIceCandidate(new RTCIceCandidate(candidate));
+            await curPc.addIceCandidate(new RTCIceCandidate(candidate));
           }
         }
       } catch (err) {
@@ -305,16 +305,16 @@ export function useWebRTC(
 
     const handleAnswer = async (data: { from: ParticipantId; answer: RTCSessionDescriptionInit }) => {
       if (data.from === localParticipantIdRef.current) return;
-      const pc = peerConnectionRef.current;
-      if (!pc) return;
+      const curPc = peerConnectionRef.current;
+      if (!curPc) return;
 
       try {
-        await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+        await curPc.setRemoteDescription(new RTCSessionDescription(data.answer));
 
         while (pendingCandidatesRef.current.length > 0) {
           const candidate = pendingCandidatesRef.current.shift();
           if (candidate) {
-            await pc.addIceCandidate(new RTCIceCandidate(candidate));
+            await curPc.addIceCandidate(new RTCIceCandidate(candidate));
           }
         }
       } catch (err) {
@@ -325,12 +325,12 @@ export function useWebRTC(
 
     const handleIceCandidate = async (data: { from: ParticipantId; candidate: RTCIceCandidateInit }) => {
       if (data.from === localParticipantIdRef.current) return;
-      const pc = peerConnectionRef.current;
-      if (!pc) return;
+      const curPc = peerConnectionRef.current;
+      if (!curPc) return;
 
       try {
-        if (pc.remoteDescription) {
-          await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+        if (curPc.remoteDescription) {
+          await curPc.addIceCandidate(new RTCIceCandidate(data.candidate));
         } else {
           pendingCandidatesRef.current.push(data.candidate);
         }
@@ -340,22 +340,16 @@ export function useWebRTC(
       }
     };
 
-    const ws3 = socketRef.current;
-    if (ws3) {
-      ws3.on('webrtc:offer', handleOffer);
-      ws3.on('webrtc:answer', handleAnswer);
-      ws3.on('webrtc:ice-candidate', handleIceCandidate);
-    }
+    ws.on('webrtc:offer', handleOffer);
+    ws.on('webrtc:answer', handleAnswer);
+    ws.on('webrtc:ice-candidate', handleIceCandidate);
 
     return () => {
-      const ws4 = socketRef.current;
-      if (ws4) {
-        ws4.off('webrtc:offer', handleOffer);
-        ws4.off('webrtc:answer', handleAnswer);
-        ws4.off('webrtc:ice-candidate', handleIceCandidate);
-      }
+      ws.off('webrtc:offer', handleOffer);
+      ws.off('webrtc:answer', handleAnswer);
+      ws.off('webrtc:ice-candidate', handleIceCandidate);
     };
-  }, []);
+  }, [socket]);
 
   const createOffer = useCallback(async () => {
     const pc = peerConnectionRef.current;

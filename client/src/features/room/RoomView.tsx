@@ -175,9 +175,14 @@ export const RoomView: React.FC = () => {
       if (soundEnabled) playShutter();
       if (hapticEnabled && 'vibrate' in navigator) (navigator as any).vibrate?.([30, 40, 80]);
       setFlash(true);
-      const t = setTimeout(() => setFlash(false), 280);
-      return () => clearTimeout(t);
+      const t = setTimeout(() => setFlash(false), 320);
+      return () => {
+        clearTimeout(t);
+        setFlash(false);
+      };
     }
+    // Ensure flash is off when leaving capturing (e.g., composing/result)
+    setFlash(false);
   }, [captureState, soundEnabled, hapticEnabled]);
 
   const handleRetakeAll = () => {
