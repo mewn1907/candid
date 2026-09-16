@@ -4,7 +4,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { buildPolaroid } from './polaroid';
 import { copyImageToClipboard, shareImage } from './share';
-import { SeasonalFrameId } from './seasonal';
+import { SEASONAL_FRAMES, SeasonalFrameId } from './seasonal';
 import { PHOTO_FILTERS, cssFilterFor } from './filters';
 import type { PhotoFilterId } from '../../types/room.types';
 
@@ -12,9 +12,11 @@ interface PolaroidStudioProps {
   photoSrc: string;
   filenameBase: string; // e.g. 'candid-photo' — polaroid gets '-polaroid' suffix
   seasonalId?: SeasonalFrameId;
+  onSeasonalChange?: (id: SeasonalFrameId) => void;
   caption: string;
   onCaptionChange: (next: string) => void;
   washiColor?: string;
+  onWashiChange?: (c: string) => void;
   note?: (msg: string) => void;
   baseFilter?: PhotoFilterId; // capture-time filter — studio starts from here
 }
@@ -23,9 +25,11 @@ export const PolaroidStudio: React.FC<PolaroidStudioProps> = ({
   photoSrc,
   filenameBase,
   seasonalId = 'none',
+  onSeasonalChange,
   caption,
   onCaptionChange,
   washiColor = '#E5BF94',
+  onWashiChange,
   note,
   baseFilter = 'natural',
 }) => {
@@ -251,6 +255,46 @@ export const PolaroidStudio: React.FC<PolaroidStudioProps> = ({
                 );
               })}
             </div>
+          </div>
+
+          {/* Card paper — seasonal tint, picked at print time */}
+          <div className="max-w-sm mx-auto">
+            <p className="text-caption font-medium text-surface-500 text-center mb-2">
+              Card paper {seasonalId !== 'none' && <span className="text-surface-700">· {SEASONAL_FRAMES.find((s) => s.id === seasonalId)?.label}</span>}
+            </p>
+            <div className="flex gap-2 overflow-x-auto pb-1 px-1 justify-start sm:justify-center" role="radiogroup" aria-label="Seasonal card paper">
+              {SEASONAL_FRAMES.map((s) => {
+                const active = s.id === seasonalId;
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    title={s.hint}
+                    onClick={() => onSeasonalChange?.(s.id)}
+                    className={'flex-shrink-0 flex flex-col items-center gap-1 px-2.5 py-1.5 rounded-full border text-[11px] font-medium transition-all ' + (active ? 'bg-surface-900 text-cream border-surface-900 shadow-sm' : 'bg-white text-surface-600 border-surface-200 hover:border-surface-400')}
+                  >
+                    <span>{s.emoji} {s.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Tape — print decoration, picked at print time */}
+          <div className="max-w-sm mx-auto flex items-center justify-center gap-2">
+            <span className="text-caption text-surface-500">Tape</span>
+            {['#E5BF94','#3E4D3A','#BD5338','#4A6B82','#F5EFEB'].map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => onWashiChange?.(c)}
+                aria-label={'Tape ' + c}
+                className={'w-6 h-6 rounded-full border transition-all ' + (washiColor === c ? 'ring-2 ring-offset-2 ring-surface-900 scale-110' : 'hover:scale-105')}
+                style={{ backgroundColor: c }}
+              />
+            ))}
           </div>
 
           {developing || !polaroidUrl ? (
