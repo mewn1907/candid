@@ -10,10 +10,22 @@ export const JoinRoomPage: React.FC = () => {
   const { joinRoom, loading, error } = useRoomContext();
   const [roomId, setRoomId] = useState(linkRoomId ?? '');
 
+  function extractRoomId(raw: string): string {
+    const trimmed = raw.trim();
+    if (!trimmed) return '';
+    // If user pastes full invite link (https://.../join/XXXXXXXXXX), extract the 10-char code
+    const m = trimmed.match(/[A-Za-z0-9_-]{10}/g);
+    if (m) return m[m.length - 1];
+    const noQuery = trimmed.split('?')[0].split('#')[0];
+    const segs = noQuery.split('/');
+    return (segs[segs.length - 1] || trimmed).trim();
+  }
+
   const join = async (id: string) => {
-    if (!id.trim()) return;
+    const extracted = extractRoomId(id);
+    if (!extracted) return;
     try {
-      const result = await joinRoom(id.trim());
+      const result = await joinRoom(extracted);
       if (result.success && result.room) {
         navigate(`/room/${result.room.id}`, { replace: true });
       }
@@ -78,9 +90,17 @@ export const JoinRoomPage: React.FC = () => {
               type="text"
               value={roomId}
               onChange={(e) => setRoomId(e.target.value)}
-              placeholder="Enter room ID"
+              onPaste={(e) => {
+                const pasted = e.clipboardData.getData('text');
+                const extracted = extractRoomId(pasted);
+                if (extracted !== pasted) {
+                  e.preventDefault();
+                  setRoomId(extracted);
+                }
+              }}
+              placeholder="Enter room ID or paste invite link"
               className="input text-center text-heading-sm tracking-widest"
-              maxLength={20}
+              maxLength={200}
               autoFocus
               required
               autoComplete="off"

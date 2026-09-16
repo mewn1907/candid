@@ -74,13 +74,21 @@ export const RoomJoiner: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
   const { joinRoom, loading, error } = useRoomContext();
   const [roomId, setRoomId] = React.useState('');
 
-  const handleJoinRoom = async () => {
-    if (!roomId.trim()) {
-      return;
-    }
+  function extractRoomId(raw: string): string {
+    const trimmed = raw.trim();
+    if (!trimmed) return '';
+    const m = trimmed.match(/[A-Za-z0-9_-]{10}/g);
+    if (m) return m[m.length - 1];
+    const noQuery = trimmed.split('?')[0].split('#')[0];
+    const segs = noQuery.split('/');
+    return (segs[segs.length - 1] || trimmed).trim();
+  }
 
+  const handleJoinRoom = async () => {
+    const extracted = extractRoomId(roomId);
+    if (!extracted) return;
     try {
-      await joinRoom(roomId.trim());
+      await joinRoom(extracted);
       setRoomId('');
       onClose?.();
     } catch (err) {
@@ -128,9 +136,17 @@ export const RoomJoiner: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
             type="text"
             value={roomId}
             onChange={(e) => setRoomId(e.target.value)}
-            placeholder="Enter room ID"
+            onPaste={(e) => {
+              const pasted = e.clipboardData.getData('text');
+              const extracted = extractRoomId(pasted);
+              if (extracted !== pasted) {
+                e.preventDefault();
+                setRoomId(extracted);
+              }
+            }}
+            placeholder="Enter room ID or paste invite link"
             className="input text-center text-heading-sm tracking-widest"
-            maxLength={20}
+            maxLength={200}
             autoComplete="off"
             autoCapitalize="off"
             autoCorrect="off"
