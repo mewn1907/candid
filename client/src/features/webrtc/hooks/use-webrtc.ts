@@ -238,18 +238,21 @@ export function useWebRTC(
     }
   }, [localStream]);
 
+  const [pcReady, setPcReady] = useState(0);
+
   useEffect(() => {
-    const socket = socketRef.current;
-    const currentRoomId = currentRoomIdRef.current;
-    const localParticipantId = localParticipantIdRef.current;
-    const localStream = localStreamRef.current;
+    const socketVal = socket;
+    const roomIdVal = currentRoomId;
+    const participantVal = localParticipantId;
 
     let cancelled = false;
-    if (socket && currentRoomId && localParticipantId && localStream) {
+    if (socketVal && roomIdVal && participantVal) {
       createPeerConnection()
         .then((pc) => {
           if (cancelled) {
             pc.close();
+          } else {
+            setPcReady((v) => v + 1);
           }
         })
         .catch((err) => {
@@ -265,7 +268,7 @@ export function useWebRTC(
         peerConnectionRef.current = null;
       }
     };
-  }, [socket, currentRoomId, localParticipantId, localStream, createPeerConnection]);
+  }, [socket, currentRoomId, localParticipantId, createPeerConnection]);
 
   useEffect(() => {
     const ws = socket;
@@ -349,7 +352,7 @@ export function useWebRTC(
       ws.off('webrtc:answer', handleAnswer);
       ws.off('webrtc:ice-candidate', handleIceCandidate);
     };
-  }, [socket]);
+  }, [socket, pcReady]);
 
   const createOffer = useCallback(async () => {
     const pc = peerConnectionRef.current;

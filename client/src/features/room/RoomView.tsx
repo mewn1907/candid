@@ -130,12 +130,12 @@ export const RoomView: React.FC = () => {
   }, [socket]);
 
   useEffect(() => {
-    if (isConnected && localStream) {
+    if (isConnected && localStream && currentParticipantId === 'A') {
       createOffer().catch((err: unknown) => {
         console.error('[RoomView] Failed to create offer:', err);
       });
     }
-  }, [isConnected, localStream, createOffer]);
+  }, [isConnected, localStream, currentParticipantId, createOffer]);
 
   useEffect(() => {
     return () => {
