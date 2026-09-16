@@ -44,9 +44,13 @@ export const LandingPage: React.FC = () => {
           <div className="absolute left-4 sm:left-12 top-6 w-52 sm:w-64 polaroid-frame animate-drift-slow z-10">
             <div className="washi-tape" />
             <div className="aspect-[4/3] bg-paper-300 rounded overflow-hidden relative shadow-inner">
-              <div className="w-full h-full bg-gradient-to-tr from-clay/30 via-paper-200 to-cream flex items-center justify-center">
-                <div className="text-center p-3">
-                  <div className="w-12 h-12 rounded-full bg-cream mx-auto flex items-center justify-center shadow-sm text-clay font-mono text-sm">YOU</div>
+              <div className="w-full h-full bg-gradient-to-tr from-clay/30 via-paper-200 to-cream flex items-center justify-center relative overflow-hidden">
+                {/* wabi doodle fill — YOU */}
+                <svg className="absolute top-3 left-3 w-10 h-10 text-clay/20" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 6 C12 6 8 12 12 18 C14 22 18 24 20 28 C22 24 26 22 28 18 C32 12 28 6 20 6Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/><path d="M14 14 C14 14 16 16 20 16 C24 16 26 14 26 14" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/><circle cx="16" cy="12" r="1.2" fill="currentColor"/><circle cx="24" cy="12" r="1.2" fill="currentColor"/></svg>
+                <svg className="absolute bottom-2 right-3 w-14 h-8 text-ink-700/15" viewBox="0 0 56 32" fill="none" aria-hidden="true"><path d="M4 16 C10 8 18 12 22 16 C26 20 34 22 42 16 C46 12 50 14 52 16" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/><path d="M22 16 C22 10 28 6 34 10" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/><path d="M12 18 L10 22 M20 20 L18 24 M34 18 L36 22" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round"/></svg>
+                <svg className="absolute top-1/2 right-2 w-6 h-6 text-pine/15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4 C8 8 6 12 12 20 C18 12 16 8 12 4Z" stroke="currentColor" strokeWidth="1"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+                <div className="text-center p-3 relative z-10">
+                  <div className="w-12 h-12 rounded-full bg-cream mx-auto flex items-center justify-center shadow-sm text-clay font-mono text-sm border border-white">YOU</div>
                 </div>
               </div>
             </div>
@@ -55,9 +59,12 @@ export const LandingPage: React.FC = () => {
           <div className="absolute right-4 sm:right-12 top-12 w-52 sm:w-64 polaroid-frame animate-drift-alt z-20">
             <div className="washi-tape !rotate-[2deg] !bg-pine-light/40" />
             <div className="aspect-[4/3] bg-paper-300 rounded overflow-hidden relative shadow-inner">
-              <div className="w-full h-full bg-gradient-to-tl from-pine/25 via-paper-200 to-cream flex items-center justify-center">
-                <div className="text-center p-3">
-                  <div className="w-12 h-12 rounded-full bg-cream mx-auto flex items-center justify-center shadow-sm text-pine font-mono text-sm">THEM</div>
+              <div className="w-full h-full bg-gradient-to-tl from-pine/25 via-paper-200 to-cream flex items-center justify-center relative overflow-hidden">
+                <svg className="absolute top-2 right-3 w-10 h-10 text-pine/20" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 32 C20 24 12 18 10 12 C12 8 16 6 20 10 C24 6 28 8 30 12 C28 18 20 24 20 32Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/><path d="M20 10 L20 18" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/></svg>
+                <svg className="absolute bottom-3 left-3 w-12 h-7 text-clay/15" viewBox="0 0 48 28" fill="none" aria-hidden="true"><path d="M6 14 C12 6 20 10 24 14 C28 18 36 20 42 14" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/><circle cx="24" cy="14" r="2" stroke="currentColor" strokeWidth="1" fill="none"/><path d="M4 16 L2 20 M14 18 L12 22" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round"/></svg>
+                <svg className="absolute top-3 left-2 w-5 h-5 text-ink-700/12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7" stroke="currentColor" strokeWidth="0.9" strokeDasharray="2 2"/><path d="M12 5 L12 9 M12 15 L12 19 M5 12 L9 12 M15 12 L19 12" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round"/></svg>
+                <div className="text-center p-3 relative z-10">
+                  <div className="w-12 h-12 rounded-full bg-cream mx-auto flex items-center justify-center shadow-sm text-pine font-mono text-sm border border-white">THEM</div>
                 </div>
               </div>
             </div>
