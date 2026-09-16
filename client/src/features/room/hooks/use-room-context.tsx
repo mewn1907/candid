@@ -72,23 +72,21 @@ const RoomContext = createContext<RoomContextType | undefined>(undefined);
 function normalizeApiUrl(url: string): string {
   const trimmed = url.trim().replace(/\/$/, '');
   if (!trimmed) return 'http://localhost:8080';
-  // Absolute URL — but still fallback localhost on Vercel to deployed Render host
+  const isLocalUrl = trimmed.includes('localhost');
+  const locHost = typeof window !== 'undefined' ? window.location.hostname : '';
+  const isLocalHost = locHost === 'localhost' || locHost === '127.0.0.1' || locHost === '::1' || locHost === '';
+  // If built API is localhost but we're on any non-local device (phone IP, vercel.app, etc.), fallback to Render
+  const shouldFallback = isLocalUrl && !isLocalHost;
   if (/^https?:\/\//i.test(trimmed)) {
-    const isLocalAbsolute = trimmed.includes('localhost');
-    if (isLocalAbsolute && typeof window !== 'undefined' && window.location.hostname.endsWith('vercel.app')) {
-      return 'https://candid-server-hb32.onrender.com';
-    }
+    if (shouldFallback) return 'https://candid-server-hb32.onrender.com';
     return trimmed;
   }
-  // Render fromService may inject short host like candid-server-hb32 without .onrender.com
   let host = trimmed;
   if (!host.includes('.') && /^[a-z0-9-]+$/i.test(host)) {
     host = `${host}.onrender.com`;
   }
-  const isLocal = host === 'localhost:8080' || host === 'localhost' || host.includes('localhost');
-  if (isLocal && typeof window !== 'undefined' && window.location.hostname.endsWith('vercel.app')) {
-    return 'https://candid-server-hb32.onrender.com';
-  }
+  const isLocalHostOnly = host === 'localhost:8080' || host === 'localhost' || host.includes('localhost');
+  if (isLocalHostOnly && shouldFallback) return 'https://candid-server-hb32.onrender.com';
   return `https://${host}`;
 }
 const _rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
