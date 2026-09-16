@@ -40,6 +40,11 @@ export async function buildPolaroid(
   ctx.fillStyle = '#a1a1aa';
   ctx.font = `${Math.round(W * 0.025)}px 'Inter', system-ui, sans-serif`;
   ctx.fillText(new Date().toLocaleDateString() + (seasonalId !== 'none' ? ` · ${seasonal.label}` : ''), canvas.width / 2, H + PAD + BOTTOM * 0.72);
+  // textured grain — warm film feel on polaroid export
+  try {
+    const { applyPaperGrain } = await import('./grain');
+    applyPaperGrain(ctx, canvas.width, canvas.height, 0.045);
+  } catch {}
   return canvas.toDataURL('image/jpeg', 0.92);
 }
 

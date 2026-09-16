@@ -97,6 +97,20 @@ export const PHOTO_FILTERS: PhotoFilter[] = [
     canvasFilter: 'sepia(0.3) contrast(1.28) brightness(0.98) saturate(1.45) hue-rotate(-10deg)',
     swatch: 'linear-gradient(135deg, #705a33 0%, #18181b 100%)',
   },
+  {
+    id: 'kodachrome',
+    label: 'Kodachrome',
+    hint: 'Warm archival film',
+    canvasFilter: 'contrast(1.12) saturate(1.35) sepia(0.18) hue-rotate(-6deg) brightness(1.04) contrast(1.05)',
+    swatch: 'linear-gradient(135deg, #d97706 0%, #92400e 50%, #1c1917 100%)',
+  },
+  {
+    id: 'velvia',
+    label: 'Velvia',
+    hint: 'Fuji vivid landscape',
+    canvasFilter: 'contrast(1.28) saturate(1.7) brightness(1.02) hue-rotate(1deg) sepia(0.04)',
+    swatch: 'linear-gradient(135deg, #10b981 0%, #047857 50%, #064e3b 100%)',
+  },
 ];
 
 export function isPhotoFilterId(value: unknown): value is PhotoFilterId {

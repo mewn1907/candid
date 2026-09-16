@@ -129,7 +129,7 @@ export function useCapture(
     
     return new Promise((resolve) => {
       let loaded = 0;
-      const checkLoaded = () => {
+      const checkLoaded = async () => {
         loaded++;
         if (loaded === 2) {
           const width = Math.max(localCanvas.width, remoteCanvas.width);
@@ -156,6 +156,12 @@ export function useCapture(
           outputCtx.fillStyle = '#fff';
           outputCtx.font = '16px sans-serif';
           outputCtx.fillText('©️ Mewn', width, height - 18);
+
+          // Textured grain — makes Warm Kodachrome / Velvia claim real on export
+          try {
+            const { applyTexturedGrain } = await import('../grain');
+            applyTexturedGrain(outputCtx, outputCanvas.width, outputCanvas.height, 0.055);
+          } catch {}
           
           resolve(outputCanvas.toDataURL('image/jpeg', 0.9));
         }

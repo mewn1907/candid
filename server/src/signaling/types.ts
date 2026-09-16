@@ -20,7 +20,7 @@ export interface WebRTCIceCandidatePayload {
   candidate: RTCIceCandidateInit;
 }
 
-export type PhotoFilterId = 'natural' | 'sepia' | 'mono' | 'warm' | 'clarendon' | 'gingham' | 'moon' | 'lark' | 'reyes' | 'juno' | 'valencia' | 'xpro';
+export type PhotoFilterId = 'natural' | 'sepia' | 'mono' | 'warm' | 'clarendon' | 'gingham' | 'moon' | 'lark' | 'reyes' | 'juno' | 'valencia' | 'xpro' | 'kodachrome' | 'velvia';
 
 export interface CapturePreparePayload {
   roomId: string;

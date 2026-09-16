@@ -82,6 +82,10 @@ export async function buildCollage(
     ctx.font = '10px Inter, system-ui, sans-serif';
     ctx.fillText(`${images.length} shots · ${new Date().toLocaleDateString()}`, canvas.width / 2, footerY + 48);
 
+    try {
+      const { applyPaperGrain } = await import('./grain');
+      applyPaperGrain(ctx, canvas.width, canvas.height, 0.05);
+    } catch {}
     return canvas.toDataURL('image/jpeg', 0.92);
   }
 
@@ -134,5 +138,9 @@ export async function buildCollage(
   ctx.textAlign = 'center';
   ctx.fillText('©️ Mewn  ·  wabi-sabi, imperfect moments', canvas.width / 2, footerY + 30);
 
+  try {
+    const { applyPaperGrain } = await import('./grain');
+    applyPaperGrain(ctx, canvas.width, canvas.height, 0.05);
+  } catch {}
   return canvas.toDataURL('image/jpeg', 0.92);
 }
