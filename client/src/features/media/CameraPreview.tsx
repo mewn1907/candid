@@ -2,6 +2,8 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { useCamera } from './hooks/use-camera';
+import { PHOTO_FILTERS } from '../capture/filters';
+import { PhotoFilterId } from '../../types/room.types';
 
 interface CameraPreviewProps {
   onError?: (error: { code: string; message: string }) => void;
@@ -9,9 +11,11 @@ interface CameraPreviewProps {
   filterStyle?: string;
   filterId?: string;
   bgBlur?: boolean;
+  allFilters?: typeof PHOTO_FILTERS;
+  onFilterSwipe?: (next: PhotoFilterId) => void;
 }
 
-export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamReady, filterStyle, filterId, bgBlur }) => {
+export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamReady, filterStyle, filterId, bgBlur, allFilters, onFilterSwipe }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const {
     stream,
@@ -98,6 +102,9 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamR
   const [showGrid, setShowGrid] = useState(false);
   const [mirrored, setMirrored] = useState(true);
   const [exposureHint, setExposureHint] = useState<string | null>(null);
+  const [showSwipeHint, setShowSwipeHint] = useState(true);
+  const touchStartX = useRef<number | null>(null);
+  const mouseDownX = useRef<number | null>(null);
 
   useEffect(() => {
     setMirrored(facingMode === 'user');
@@ -145,9 +152,53 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamR
     return () => cancelAnimationFrame(raf);
   }, [stream]);
 
+  useEffect(() => {
+    if (stream && onFilterSwipe) {
+      const t = setTimeout(() => setShowSwipeHint(false), 3200);
+      return () => clearTimeout(t);
+    }
+  }, [stream, onFilterSwipe]);
+
+  const handleSwipe = (diff: number) => {
+    if (!onFilterSwipe || !allFilters || !filterId) return;
+    if (Math.abs(diff) < 42) return;
+    const idx = allFilters.findIndex((f) => f.id === filterId);
+    if (idx === -1) return;
+    const nextIdx = diff < 0 ? (idx + 1) % allFilters.length : (idx - 1 + allFilters.length) % allFilters.length;
+    onFilterSwipe(allFilters[nextIdx].id as PhotoFilterId);
+    setShowSwipeHint(false);
+  };
+  const onTouchStart = (e: React.TouchEvent) => {
+    if ((e.target as HTMLElement).closest('button')) return;
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const diff = e.changedTouches[0].clientX - touchStartX.current;
+    handleSwipe(diff);
+    touchStartX.current = null;
+  };
+  const onMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('button')) return;
+    mouseDownX.current = e.clientX;
+  };
+  const onMouseUp = (e: React.MouseEvent) => {
+    if (mouseDownX.current === null) return;
+    const diff = e.clientX - mouseDownX.current;
+    handleSwipe(diff);
+    mouseDownX.current = null;
+  };
+
   return (
     <div className="relative w-full max-w-md mx-auto">
-      <div className="aspect-video bg-surface-950 rounded-xl overflow-hidden relative border border-surface-800/50 backdrop-blur-sm">
+      <div
+        className="aspect-video bg-surface-950 rounded-xl overflow-hidden relative border border-surface-800/50 backdrop-blur-sm select-none"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+        onMouseDown={onMouseDown}
+        onMouseUp={onMouseUp}
+        style={{ touchAction: 'pan-y' } as any}
+      >
         {stream ? (
           <>
               <video
@@ -162,6 +213,26 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamR
                 playsInline
                 muted
               />
+            {/* Swipe filter — insta/snap on preview */}
+            {stream && onFilterSwipe && allFilters && (
+              <div className="absolute bottom-14 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none z-10">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/55 backdrop-blur-md border border-white/15">
+                  <span className={`w-1.5 h-1.5 rounded-full ${filterId === 'natural' ? 'bg-white' : 'bg-white/60'}`} />
+                  <span className="text-white text-[11px] font-medium tracking-wide">{allFilters.find((f) => f.id === filterId)?.label ?? filterId}</span>
+                  <span className="text-white/60 text-[10px]">•</span>
+                  <span className="text-white/70 text-[10px] font-mono">{allFilters.findIndex((f) => f.id === filterId) + 1}/{allFilters.length}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {allFilters.slice(0, 8).map((f) => (
+                    <span key={f.id} className={`h-1 rounded-full transition-all ${f.id === filterId ? 'w-4 bg-white' : 'w-1 bg-white/40'}`} />
+                  ))}
+                  {allFilters.length > 8 && <span className="text-white/50 text-[9px]">+{allFilters.length - 8}</span>}
+                </div>
+                {showSwipeHint && (
+                  <span className="text-white/70 text-[10px] font-mono bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-sm">Swipe ← → to change</span>
+                )}
+              </div>
+            )}
             {showGrid && (
               <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
                 <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">

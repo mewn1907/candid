@@ -626,6 +626,8 @@ export const RoomView: React.FC = () => {
                   filterStyle={canvasFilterFor(filter)}
                   filterId={filter}
                   bgBlur={bgBlur}
+                  allFilters={PHOTO_FILTERS}
+                  onFilterSwipe={setFilter}
                 />
 
                 <RemoteVideo
@@ -1112,7 +1114,10 @@ export const RoomView: React.FC = () => {
 
               {captureState === 'idle' && (
                 <div className="pt-4 animate-in space-y-6">
-                  <FilterSelector selected={filter} onSelect={setFilter} />
+                  <div className="hidden sm:block">
+                    <FilterSelector selected={filter} onSelect={setFilter} />
+                  </div>
+                  <p className="sm:hidden text-center text-[11px] text-ink-500 -mt-2">Swipe on your camera to change filters — like Insta • Try it!</p>
                   <SeasonalSelector selected={seasonalFrame} onSelect={setSeasonalFrame} />
                   <ThemeSwitcher />
                   <div className="card p-4 border-paper-border/80 bg-paper-50/70">
