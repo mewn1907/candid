@@ -39,13 +39,8 @@ export const StarsBackground: React.FC = () => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const getThemeStarColors = (): string[] => {
-      const theme = document.documentElement.getAttribute('data-theme') || 'sabi';
-      // unmistakable contrast — pure dark/light so they pop on any paper
-      if (theme === 'kintsugi') return ['rgba(212,175,55,', 'rgba(255,230,120,', 'rgba(255,255,255,'];
-      if (theme === 'minimal') return ['rgba(0,0,0,', 'rgba(20,20,20,', 'rgba(40,40,40,'];
-      if (theme === 'ink') return ['rgba(0,0,0,', 'rgba(30,30,30,', 'rgba(60,60,60,'];
-      if (theme === 'nordic') return ['rgba(30,40,30,', 'rgba(0,0,0,', 'rgba(60,60,60,'];
-      return ['rgba(20,20,20,', 'rgba(60,40,10,', 'rgba(0,0,0,']; // sabi — pure dark on #FDF8F0 light paper
+      // golden shining stars on all themes — user requested gold, not black
+      return ['rgba(212,175,55,', 'rgba(240,200,80,', 'rgba(255,230,120,'];
     };
 
     const resize = () => {
