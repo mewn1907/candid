@@ -15,7 +15,7 @@ function sendError(socket: TypedSocket, message: string): void {
 
 export function setupRoomHandlers(io: TypedServer, socket: TypedSocket): void {
   socket.on('room:create', () => {
-    const result = handleCreateRoom(socket.handshake.address);
+    const result = handleCreateRoom(socket.handshake.address, socket.id);
     if (result.success) {
       socket.join(result.roomId);
     }

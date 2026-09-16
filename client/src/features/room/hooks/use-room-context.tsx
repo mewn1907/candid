@@ -178,7 +178,13 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     newSocket.on('room:created', (data) => {
       setLoading(false);
       if (data.success) {
-        setCurrentRoom({ id: data.roomId, participants: [], status: 'waiting', createdAt: Date.now(), expiresAt: Date.now() + 3600000 });
+        setCurrentRoom({
+          id: data.roomId,
+          participants: [{ id: data.participantId, role: data.participantId, socketId: newSocket.id || '', joinedAt: Date.now() }],
+          status: 'waiting',
+          createdAt: Date.now(),
+          expiresAt: Date.now() + 3600000,
+        });
         setCurrentParticipantId(data.participantId);
         saveRoomState(data.roomId, data.participantId);
         setError(null);

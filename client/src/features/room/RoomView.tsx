@@ -71,12 +71,12 @@ export const RoomView: React.FC = () => {
   );
 
   useEffect(() => {
-    if (roomId) {
-      joinRoom(roomId).catch(() => {
-        navigate('/', { replace: true });
-      });
-    }
-  }, [roomId, joinRoom, navigate]);
+    if (!roomId) return;
+    if (currentRoom?.id === roomId && currentParticipantId && currentRoom.participants.some((p) => p.id === currentParticipantId)) return;
+    joinRoom(roomId).catch(() => {
+      navigate('/', { replace: true });
+    });
+  }, [roomId, currentRoom?.id, currentRoom?.participants, currentParticipantId, joinRoom, navigate]);
 
   useEffect(() => {
     if (webrtcHookError) {

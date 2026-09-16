@@ -44,7 +44,7 @@ export function purgeStaleIpCreations(windowMs: number = config.roomExpirySecond
   return purged;
 }
 
-export function handleCreateRoom(clientIp?: string): CreateRoomResult {
+export function handleCreateRoom(clientIp?: string, socketId?: string): CreateRoomResult {
   if (clientIp && !isRoomCreationAllowed(clientIp)) {
     return {
       roomId: '',
@@ -56,6 +56,10 @@ export function handleCreateRoom(clientIp?: string): CreateRoomResult {
   const roomId = nanoid(10);
   const room = createRoom(roomId);
   const participantId: ParticipantId = 'A';
+  // Register creator as Participant A immediately so RoomView doesn't need a second join
+  if (socketId) {
+    addParticipant(roomId, socketId, participantId);
+  }
   return {
     roomId: room.id,
     participantId,
