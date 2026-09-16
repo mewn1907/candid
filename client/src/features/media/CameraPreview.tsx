@@ -150,17 +150,18 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamR
       <div className="aspect-video bg-surface-950 rounded-xl overflow-hidden relative border border-surface-800/50 backdrop-blur-sm">
         {stream ? (
           <>
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover"
-              style={{ 
-                transform: mirrored ? 'scaleX(-1)' : undefined,
-                filter: [filterStyle, bgBlur ? 'blur(6px)' : ''].filter(Boolean).join(' ') || undefined,
-              }}
-              autoPlay
-              playsInline
-              muted
-            />
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                style={{ 
+                  transform: mirrored ? 'scaleX(-1)' : undefined,
+                  filter: [filterStyle, bgBlur ? 'blur(6px)' : ''].filter(Boolean).join(' ') || undefined,
+                  transition: 'filter 220ms ease',
+                }}
+                autoPlay
+                playsInline
+                muted
+              />
             {showGrid && (
               <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
                 <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">

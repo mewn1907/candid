@@ -15,10 +15,10 @@ export interface PhotoFilter {
 export const PHOTO_FILTERS: PhotoFilter[] = [
   {
     id: 'natural',
-    label: 'Natural',
-    hint: 'Untouched light',
-    canvasFilter: '',
-    swatch: 'linear-gradient(135deg, #e7e5e4, #a1a1aa)',
+    label: 'None',
+    hint: 'No filter — original',
+    canvasFilter: 'none',
+    swatch: 'repeating-conic-gradient(#e7e5e4 0% 25%, #fafaf9 0% 50%) 50% / 12px 12px',
   },
   {
     id: 'sepia',
@@ -100,9 +100,25 @@ export const PHOTO_FILTERS: PhotoFilter[] = [
 ];
 
 export function isPhotoFilterId(value: unknown): value is PhotoFilterId {
+  if (value === 'none') return true;
   return PHOTO_FILTERS.some((f) => f.id === value);
 }
 
+export function normalizePhotoFilterId(value: unknown): PhotoFilterId {
+  if (value === 'none') return 'natural';
+  return isPhotoFilterId(value) ? (value as PhotoFilterId) : 'natural';
+}
+
 export function canvasFilterFor(filter: PhotoFilterId): string {
-  return PHOTO_FILTERS.find((f) => f.id === filter)?.canvasFilter ?? '';
+  const normalized = filter === ('none' as PhotoFilterId) ? 'natural' : filter;
+  const raw = PHOTO_FILTERS.find((f) => f.id === normalized)?.canvasFilter ?? '';
+  // Canonical "none" is no CSS effect: empty string lets <video> render untouched.
+  // PHOTO_FILTERS stores 'none' for the None preset so the swatch is self-describing,
+  // but callers expecting '' get the same visual result.
+  return raw === 'none' ? '' : raw;
+}
+
+export function cssFilterFor(filter: PhotoFilterId): string {
+  const v = canvasFilterFor(filter);
+  return v || 'none';
 }

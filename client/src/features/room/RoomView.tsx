@@ -504,6 +504,8 @@ export const RoomView: React.FC = () => {
                   stream={remoteStream}
                   participantLabel={otherParticipantLabel}
                   connectionState={connectionState}
+                  filterStyle={canvasFilterFor(filter)}
+                  filterId={filter}
                 />
               </div>
               {bgBlur && <p className="text-[11px] text-ink-500 text-center">Cozy blur bg enabled (extra)</p>}
@@ -514,10 +516,15 @@ export const RoomView: React.FC = () => {
                   <a href={clipUrl} download={`candid-clip-${Date.now()}.webm`} className="btn-ghost btn-sm mt-2">Download clip</a>
                 </div>
               )}
-              {filter !== 'natural' && (
-                <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-full bg-clay-subtle border border-clay/20 w-fit mx-auto animate-in">
+              {filter !== 'natural' && (filter as string) !== 'none' ? (
+                <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-full bg-clay-subtle border border-clay/20 w-fit mx-auto animate-in" aria-live="polite">
                   <span className="w-3 h-3 rounded-full border border-white shadow-sm" style={{ background: PHOTO_FILTERS.find(f=>f.id===filter)?.swatch as any || '#c7b48f' }} />
-                  <span className="text-caption font-medium text-clay-dark">Preview: {filter} — warm live filter active</span>
+                  <span className="text-caption font-medium text-clay-dark">Live preview: {PHOTO_FILTERS.find(f=>f.id===filter)?.label ?? filter} — {PHOTO_FILTERS.find(f=>f.id===filter)?.hint ?? 'filtered'}</span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center gap-2 py-1.5 px-3 rounded-full bg-paper-50 border border-paper-border w-fit mx-auto">
+                  <span className="w-3 h-3 rounded-full border border-dashed border-ink-300 bg-white flex items-center justify-center text-[7px]">∅</span>
+                  <span className="text-caption text-ink-600">Live preview: None — original, no filter (default)</span>
                 </div>
               )}
 

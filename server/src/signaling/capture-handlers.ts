@@ -61,10 +61,11 @@ export function setupCaptureHandlers(io: TypedServer, socket: TypedSocket): void
       imagesReceived: new Set(),
     });
 
+    const normalizedFilter = validation.data.filter === 'none' ? 'natural' : validation.data.filter;
     io.to(room.id).emit('capture:prepare', {
       captureId,
       targetTime,
-      filter: validation.data.filter,
+      filter: normalizedFilter,
       burstIndex: validation.data.burstIndex,
       burstTotal: validation.data.burstTotal,
     });

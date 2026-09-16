@@ -7,6 +7,8 @@ interface RemoteVideoProps {
   participantLabel: string;
   connectionState: string;
   className?: string;
+  filterStyle?: string;
+  filterId?: string;
 }
 
 export const RemoteVideo: React.FC<RemoteVideoProps> = ({
@@ -14,6 +16,8 @@ export const RemoteVideo: React.FC<RemoteVideoProps> = ({
   participantLabel,
   connectionState,
   className = '',
+  filterStyle,
+  filterId,
 }) => {
   const videoRef = React.useRef<HTMLVideoElement>(null);
 
@@ -34,10 +38,19 @@ export const RemoteVideo: React.FC<RemoteVideoProps> = ({
       <video
         ref={videoRef}
         className="w-full h-full object-cover"
+        style={{
+          filter: filterStyle || undefined,
+          transition: 'filter 220ms ease',
+        }}
         autoPlay
         playsInline
         muted
       />
+      {stream && filterId && filterId !== 'natural' && filterId !== 'none' && (
+        <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-clay/85 text-cream text-[10px] font-mono uppercase tracking-wider backdrop-blur-sm border border-white/20 shadow-sm" aria-live="polite">
+          {filterId}
+        </div>
+      )}
       {showGrid && stream && (
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
