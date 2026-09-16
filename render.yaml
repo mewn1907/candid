@@ -33,7 +33,6 @@ services:
     name: candid-client
     env: static
     plan: free
-    region: oregon
     branch: main
     rootDir: client
     buildCommand: npm ci && npm run build
