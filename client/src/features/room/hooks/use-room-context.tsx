@@ -56,6 +56,8 @@ interface RoomContextType {
   loading: boolean;
   error: string | null;
   socket: TypedSocket | null;
+  isConnected: boolean;
+  apiUrl: string;
   createRoom: () => Promise<CreateRoomResult>;
   joinRoom: (roomId: string) => Promise<JoinRoomResult>;
   leaveRoom: () => void;
@@ -116,6 +118,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
   const [socket, setSocket] = useState<TypedSocket | null>(null);
   const [rejoining, setRejoining] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
 
   // Refs mirror state for the mount-once socket effect below. The socket
   // must survive room changes: recreating it on every join would make the
@@ -133,7 +136,9 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     newSocket.on('connect', () => {
-      console.log('[Socket] Connected:', newSocket.id);
+      console.log('[Socket] Connected:', newSocket.id, '->', API_URL);
+      setIsConnected(true);
+      setError(null);
       // Attempt to rejoin if we have stored state and aren't already in a room
       const { roomId, participantId } = getStoredRoomState();
       if (roomId && participantId && !currentRoomRef.current && !rejoiningRef.current) {
@@ -144,11 +149,13 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     newSocket.on('disconnect', (reason) => {
       console.log('[Socket] Disconnected:', reason);
+      setIsConnected(false);
     });
 
     newSocket.on('connect_error', (err) => {
-      console.error('[Socket] Connection error:', err);
-      setError('Failed to connect to server');
+      console.error('[Socket] Connection error:', err, '->', API_URL);
+      setIsConnected(false);
+      setError(`Failed to connect to server at ${API_URL}. Check VITE_API_URL and CORS_ORIGIN. (${err.message})`);
     });
 
     newSocket.on('room:created', (data) => {
@@ -249,7 +256,21 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const createRoom = useCallback(async (): Promise<CreateRoomResult> => {
-    if (!socket) throw new Error('Socket not connected');
+    if (!socket) throw new Error('Socket not initialized');
+    // Wait for an active connection (fixes immediate CreateRoomPage emit
+    // racing socket connect, and surfaces deployed misconfig clearly).
+    if (!socket.connected) {
+      const connected = await new Promise<boolean>((resolve) => {
+        const timer = setTimeout(() => resolve(false), 8000);
+        socket.once('connect', () => { clearTimeout(timer); resolve(true); });
+      });
+      if (!connected) {
+        const msg = `Cannot reach server at ${API_URL}. Set VITE_API_URL to your deployed server URL and CORS_ORIGIN to your frontend URL, then redeploy.`;
+        setLoading(false);
+        setError(msg);
+        return { roomId: '', participantId: 'A', success: false, message: msg };
+      }
+    }
     setLoading(true);
     setError(null);
     return new Promise((resolve) => {
@@ -270,7 +291,19 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [socket]);
 
   const joinRoom = useCallback(async (roomId: string): Promise<JoinRoomResult> => {
-    if (!socket) throw new Error('Socket not connected');
+    if (!socket) throw new Error('Socket not initialized');
+    if (!socket.connected) {
+      const connected = await new Promise<boolean>((resolve) => {
+        const timer = setTimeout(() => resolve(false), 8000);
+        socket.once('connect', () => { clearTimeout(timer); resolve(true); });
+      });
+      if (!connected) {
+        const msg = `Cannot reach server at ${API_URL}. Set VITE_API_URL to your deployed server URL and CORS_ORIGIN to your frontend URL, then redeploy.`;
+        setLoading(false);
+        setError(msg);
+        return { room: null, participantId: 'A', success: false, message: msg };
+      }
+    }
     setLoading(true);
     setError(null);
     return new Promise((resolve) => {
@@ -329,6 +362,8 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         error,
         socket,
+        isConnected,
+        apiUrl: API_URL,
         createRoom,
         joinRoom,
         leaveRoom,
