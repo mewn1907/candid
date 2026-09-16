@@ -1,4 +1,4 @@
-// ©️ Mewn — Elegant floating golden stars (Stitch)
+// ©️ Mewn — Elegant floating golden stars (Stitch) — responsive density
 import React, { useEffect, useRef } from 'react';
 
 interface Star {
@@ -17,6 +17,7 @@ interface Star {
 
 export const StarsBackground: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const starsRef = useRef<Star[]>([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -24,33 +25,53 @@ export const StarsBackground: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animId: number;
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
+
+    const goldenHues = ['#f6c589', '#e8a355', '#fedca8', '#d4883b'];
+
+    const getStarCount = (w: number, h: number) => {
+      const area = w * h;
+      return Math.max(32, Math.min(82, Math.round(area / 22000)));
+    };
 
     const handleResize = () => {
       if (!canvas) return;
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
+      const newCount = getStarCount(width, height);
+      if (starsRef.current.length && newCount !== starsRef.current.length) {
+        starsRef.current = Array.from({ length: newCount }, () => ({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          radius: Math.random() * 1.6 + 0.7,
+          baseAlpha: Math.random() * 0.45 + 0.4,
+          twinkleSpeed: Math.random() * 0.022 + 0.008,
+          twinklePhase: Math.random() * Math.PI * 2,
+          vx: (Math.random() - 0.5) * 0.22,
+          vy: (Math.random() - 0.55) * 0.32,
+          zigAmp: Math.random() * 0.9 + 0.4,
+          zigSpeed: Math.random() * 0.0018 + 0.0007,
+          isCross: Math.random() > 0.72,
+        }));
+      }
     };
     window.addEventListener('resize', handleResize);
 
-    // Warm golden palette matching CANDID
-    const goldenHues = ['#f6c589', '#e8a355', '#fedca8', '#d4883b'];
-
-    const stars: Star[] = Array.from({ length: 68 }, () => ({
+    const stars: Star[] = Array.from({ length: getStarCount(width, height) }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      radius: Math.random() * 2.2 + 1.4,
-      baseAlpha: Math.random() * 0.35 + 0.55,
+      radius: Math.random() * 1.6 + 0.7,
+      baseAlpha: Math.random() * 0.45 + 0.4,
       twinkleSpeed: Math.random() * 0.022 + 0.008,
       twinklePhase: Math.random() * Math.PI * 2,
       vx: (Math.random() - 0.5) * 0.22,
-      vy: (Math.random() - 0.55) * 0.32, // zig-zag: some up, some down — not only upwards
+      vy: (Math.random() - 0.55) * 0.32,
       zigAmp: Math.random() * 0.9 + 0.4,
       zigSpeed: Math.random() * 0.0018 + 0.0007,
-      isCross: Math.random() > 0.68 // ~32% are 4-point shining cross stars
+      isCross: Math.random() > 0.72,
     }));
+    starsRef.current = stars;
 
     const drawCrossStar = (x: number, y: number, r: number, alpha: number) => {
       ctx.save();
@@ -64,7 +85,6 @@ export const StarsBackground: React.FC = () => {
       ctx.moveTo(x, y - r * 3.2);
       ctx.lineTo(x, y + r * 3.2);
       ctx.stroke();
-      // diagonal glint
       ctx.globalAlpha = alpha * 0.55;
       ctx.lineWidth = 0.9;
       ctx.beginPath();
@@ -76,29 +96,27 @@ export const StarsBackground: React.FC = () => {
       ctx.restore();
     };
 
+    let animId: number;
     const render = () => {
       ctx.clearRect(0, 0, width, height);
       const now = performance.now();
 
-      for (const s of stars) {
+      for (const s of starsRef.current) {
         s.twinklePhase += s.twinkleSpeed;
         const alpha = s.baseAlpha + Math.sin(s.twinklePhase) * 0.25;
         const clampedAlpha = Math.max(0.1, Math.min(1, alpha));
 
-        // Zig-zag drift — sine wave horizontal + gentle vertical, not only upwards
         const zigX = Math.sin(now * s.zigSpeed + s.twinklePhase) * s.zigAmp;
         const zigY = Math.cos(now * s.zigSpeed * 0.7 + s.twinklePhase * 0.6) * s.zigAmp * 0.35;
         const mx = s.vx + zigX * 0.08;
         const my = s.vy + zigY * 0.08;
         s.x += mx;
         s.y += my;
-        // soft wrap with margin
         if (s.y < -14) s.y = height + 14;
         if (s.y > height + 14) s.y = -14;
         if (s.x < -14) s.x = width + 14;
         if (s.x > width + 14) s.x = -14;
 
-        // Long floating tail — golden comet trail (follows zig-zag vector)
         const tailLen = 26;
         const tailX = s.x - mx * tailLen * 7;
         const tailY = s.y - my * tailLen * 7;
@@ -116,7 +134,6 @@ export const StarsBackground: React.FC = () => {
         ctx.lineTo(s.x, s.y);
         ctx.stroke();
         ctx.shadowBlur = 0;
-        // second fainter wider tail for depth
         ctx.strokeStyle = `rgba(255,230,120,${clampedAlpha * 0.14})`;
         ctx.lineWidth = s.radius * 1.4;
         ctx.beginPath();
@@ -124,7 +141,6 @@ export const StarsBackground: React.FC = () => {
         ctx.lineTo(s.x, s.y);
         ctx.stroke();
 
-        // Draw star core — shining with halo
         ctx.shadowBlur = s.isCross ? 14 : 8;
         ctx.shadowColor = s.isCross ? `rgba(255,230,120,${clampedAlpha * 0.85})` : `rgba(246,197,137,${clampedAlpha * 0.65})`;
         ctx.fillStyle = goldenHues[Math.floor(s.radius * 3) % goldenHues.length];
@@ -133,7 +149,6 @@ export const StarsBackground: React.FC = () => {
         ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
         ctx.fill();
         ctx.shadowBlur = 0;
-        // outer glow
         ctx.fillStyle = `rgba(255,230,120,${clampedAlpha * 0.22})`;
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.radius * 2.4, 0, Math.PI * 2);
