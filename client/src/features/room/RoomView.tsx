@@ -234,6 +234,102 @@ export const RoomView: React.FC = () => {
     setTimeout(() => setShareNote(null), 2200);
   };
 
+  // Keyboard shortcuts: Space/Enter → Capture, R → Retake, D → Download, Esc → Leave/Close
+  // Respects focus in inputs/textareas and open overlays; no capture during countdown/capturing.
+  useEffect(() => {
+    const isTypingTarget = (el: Element | null) => {
+      if (!el) return false;
+      const tag = el.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+      return (el as HTMLElement).isContentEditable;
+    };
+
+    const triggerDownload = (url: string, filename: string) => {
+      try {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        flashNote('Download started ✓ (D)');
+      } catch {
+        flashNote('Download failed — try the button');
+      }
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      const active = document.activeElement;
+      const isTyping = isTypingTarget(active);
+      const hasOverlay = !!(editingSrc || doodleTarget || stickerTarget);
+
+      if (e.key === 'Escape') {
+        if (hasOverlay) {
+          setEditingSrc(null);
+          setEditingTarget(null);
+          setDoodleTarget(null);
+          setStickerTarget(null);
+          if (showPrompt) setShowPrompt(false);
+          e.preventDefault();
+          return;
+        }
+        if (showPrompt) {
+          setShowPrompt(false);
+          e.preventDefault();
+          return;
+        }
+        if (isTyping) return;
+        if (captureState === 'idle' || captureState === 'result' || captureState === 'gallery') {
+          handleLeave();
+          e.preventDefault();
+        }
+        return;
+      }
+
+      if (isTyping || hasOverlay) return;
+      if (!isConnected) return;
+
+      const key = e.key.toLowerCase();
+
+      if ((e.code === 'Space' || e.key === ' ' || e.key === 'Enter') && captureState === 'idle') {
+        if (!localStream) return;
+        if (active && active.tagName === 'BUTTON') return;
+        e.preventDefault();
+        handleStartCapture();
+        return;
+      }
+
+      if (key === 'r' && (captureState === 'result' || captureState === 'gallery')) {
+        e.preventDefault();
+        handleRetakeAll();
+        return;
+      }
+
+      if (key === 'd' && (captureState === 'result' || captureState === 'gallery')) {
+        e.preventDefault();
+        if (captureState === 'result' && displaySingle) {
+          triggerDownload(displaySingle, 'candid-photo.jpg');
+        } else if (captureState === 'gallery' && displayBurstSrc) {
+          triggerDownload(displayBurstSrc, `candid-burst-${selectedGalleryIndex + 1}.jpg`);
+        } else if (displayCollage) {
+          triggerDownload(displayCollage, `candid-collage-${collageChoice}.jpg`);
+        }
+        return;
+      }
+
+      if (key === '?' || (key === 'h' && e.shiftKey)) {
+        flashNote('Shortcuts: Space/Enter=Capture · R=Retake · D=Download · Esc=Leave/Close');
+        e.preventDefault();
+        return;
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  // handleLeave/handleRetakeAll/handleStartCapture are stable for this room session; include isConnected/captureState etc to rebind when state changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, captureState, localStream, editingSrc, doodleTarget, stickerTarget, showPrompt, displaySingle, displayBurstSrc, displayCollage, selectedGalleryIndex, collageChoice, burstImages.length]);
+
   const copyText = async (text: string): Promise<boolean> => {
     try {
       if (navigator.clipboard?.writeText) {
@@ -374,8 +470,10 @@ export const RoomView: React.FC = () => {
             <button
               onClick={handleLeave}
               className="btn-ghost btn-sm"
+              title="Shortcut: Esc"
+              aria-keyshortcuts="Escape"
             >
-              Leave Room
+              Leave Room <kbd className="hidden sm:inline-flex ml-1 items-center px-1 py-0.5 rounded border border-surface-300 bg-white text-[10px] font-mono">Esc</kbd>
             </button>
           </div>
         </div>
@@ -545,11 +643,13 @@ export const RoomView: React.FC = () => {
                         retake();
                       }}
                       className="btn-secondary btn-lg flex-1"
+                      title="Shortcut: R"
+                      aria-keyshortcuts="r"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                       </svg>
-                      Retake
+                      Retake <kbd className="ml-1 hidden sm:inline-flex items-center px-1 py-0.5 rounded border border-surface-300 bg-white text-[10px] font-mono">R</kbd>
                     </button>
                     <button
                       onClick={() => {
@@ -564,13 +664,16 @@ export const RoomView: React.FC = () => {
                       href={displaySingle!}
                       download="candid-photo.jpg"
                       className="btn-success btn-lg flex-1 flex items-center justify-center gap-2"
+                      title="Shortcut: D"
+                      aria-keyshortcuts="d"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
-                      Download
+                      Download <kbd className="ml-1 hidden sm:inline-flex items-center px-1 py-0.5 rounded border border-white/30 bg-white/20 text-[10px] font-mono">D</kbd>
                     </a>
                   </div>
+                  <p className="text-[11px] text-ink-500 text-center">Shortcuts: <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">R</kbd> retake · <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">D</kbd> download · <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">Esc</kbd> leave</p>
                   <div className="flex gap-2 justify-center">
                     <button
                       onClick={async () => {
@@ -687,11 +790,11 @@ export const RoomView: React.FC = () => {
                     ))}
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <button onClick={handleRetakeAll} className="btn-secondary btn-lg flex-1">
+                    <button onClick={handleRetakeAll} className="btn-secondary btn-lg flex-1" title="Shortcut: R" aria-keyshortcuts="r">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                       </svg>
-                      New burst
+                      New burst <kbd className="ml-1 hidden sm:inline-flex items-center px-1 py-0.5 rounded border border-surface-300 bg-white text-[10px] font-mono">R</kbd>
                     </button>
                     <button
                       onClick={() => {
@@ -706,13 +809,16 @@ export const RoomView: React.FC = () => {
                       href={displayBurstSrc}
                       download={`candid-burst-${selectedGalleryIndex + 1}.jpg`}
                       className="btn-success btn-lg flex-1 flex items-center justify-center gap-2"
+                      title="Shortcut: D"
+                      aria-keyshortcuts="d"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                       </svg>
-                      Download
+                      Download <kbd className="ml-1 hidden sm:inline-flex items-center px-1 py-0.5 rounded border border-white/30 bg-white/20 text-[10px] font-mono">D</kbd>
                     </a>
                   </div>
+                  <p className="text-[11px] text-ink-500 text-center">Shortcuts: <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">R</kbd> new burst · <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">D</kbd> download · <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">Esc</kbd> leave</p>
                   <div className="flex gap-2 justify-center">
                     <button
                       onClick={async () => {
@@ -1034,13 +1140,17 @@ export const RoomView: React.FC = () => {
                     disabled={!localStream}
                     className="btn-primary btn-lg w-full"
                     aria-disabled={!localStream}
+                    aria-keyshortcuts="Space Enter"
+                    title="Shortcut: Space or Enter"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     <span>Start Capture {promptEnabled ? '(extra: prompt)' : ''}</span>
+                    <kbd className="ml-2 hidden sm:inline-flex items-center px-1.5 py-0.5 rounded border border-white/30 bg-white/20 text-[10px] font-mono">Space</kbd>
                   </button>
+                  <p className="text-[11px] text-ink-500 text-center">Shortcut: <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">Space</kbd> or <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">Enter</kbd> to capture · <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">Esc</kbd> to leave · <kbd className="px-1 py-0.5 rounded border border-paper-border bg-white text-[10px] font-mono">?</kbd> for help</p>
                   {promptEnabled && <p className="text-[11px] text-ink-500 text-center">Prompt card will show before countdown (extra)</p>}
                 </div>
               )}
