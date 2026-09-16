@@ -6,7 +6,7 @@ import { useRoomContext } from './hooks/use-room-context';
 import { InvitePanel } from './components/InvitePanel';
 import { CameraPreview } from '../media/CameraPreview';
 import { useWebRTC, RemoteVideo } from '../webrtc';
-import { useCapture, FilterSelector } from '../capture';
+import { useCapture } from '../capture';
 import { PhotoEditor } from '../capture/PhotoEditor';
 import { buildPolaroid } from '../capture/polaroid';
 import { playTick, playShutter } from '../capture/sounds';
@@ -1114,10 +1114,6 @@ export const RoomView: React.FC = () => {
 
               {captureState === 'idle' && (
                 <div className="pt-4 animate-in space-y-6">
-                  <div className="hidden sm:block">
-                    <FilterSelector selected={filter} onSelect={setFilter} />
-                  </div>
-                  <p className="sm:hidden text-center text-[11px] text-ink-500 -mt-2">Swipe on your camera to change filters — like Insta • Try it!</p>
                   <SeasonalSelector selected={seasonalFrame} onSelect={setSeasonalFrame} />
                   <ThemeSwitcher />
                   <div className="card p-4 border-paper-border/80 bg-paper-50/70">
