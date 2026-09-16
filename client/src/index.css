@@ -263,6 +263,15 @@ html[data-theme="ink"] .text-clay { color: #2B2B2B !important; }
 html[data-theme="ink"] .bg-pine { background-color: #2B2B2B !important; }
 html[data-theme="ink"] .bg-pine-subtle { background-color: #F0EDE8 !important; }
 
+/* Create/Join card-deckle contrast per theme */
+html[data-theme="kintsugi"] .card-deckle { background-color: #1C1B18 !important; background-image: linear-gradient(to bottom right, rgba(212,175,55,0.07), rgba(20,20,18,0.65)) !important; border-color: rgba(197,168,128,0.6) !important; }
+html[data-theme="minimal"] .card-deckle { background-color: #FFFFFF !important; background-image: linear-gradient(to bottom right, rgba(255,255,255,0.9), rgba(245,245,245,0.9)) !important; }
+html[data-theme="nordic"] .card-deckle { background-image: linear-gradient(to bottom right, rgba(255,255,255,0.7), rgba(232,236,229,0.5)) !important; }
+html[data-theme="ink"] .card-deckle { background-image: linear-gradient(to bottom right, rgba(255,254,251,0.9), rgba(240,237,232,0.7)) !important; }
+html[data-theme="kintsugi"] .input { background-color: #23211E !important; border-color: #C5A880 !important; color: #FDFBF7 !important; }
+html[data-theme="kintsugi"] .input::placeholder { color: #736F68 !important; }
+html[data-theme="minimal"] .input::placeholder { color: #A3A3A3 !important; }
+
 @layer base {
   html { @apply scroll-smooth; }
   body {

@@ -2,6 +2,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useRoomContext } from './hooks/use-room-context';
+import { StarsBackground } from '../landing/StarsBackground';
+import { ThemeSwitcher } from '../theme';
 
 export const CreateRoomPage: React.FC = () => {
   const navigate = useNavigate();
@@ -23,14 +25,18 @@ export const CreateRoomPage: React.FC = () => {
   }, [createRoom, navigate, attempt, isConnected]);
 
   return (
-    <div className="relative min-h-screen bg-paper-100 bg-paper-grain flex flex-col justify-between p-6">
-      <div className="max-w-md w-full mx-auto pt-4">
+    <div className="relative min-h-screen bg-paper-100 bg-paper-grain flex flex-col justify-between p-6 overflow-hidden">
+      <StarsBackground />
+      <div className="max-w-md w-full mx-auto pt-4 flex items-center justify-between relative z-10">
         <Link to="/" className="inline-flex items-center gap-2 text-ink-700 hover:text-ink-900 transition-colors text-sm font-medium">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
           <span>Back to warm lobby</span>
         </Link>
+        <div className="hidden sm:flex">
+          <ThemeSwitcher compact />
+        </div>
       </div>
-      <div className="max-w-md w-full mx-auto my-auto py-8">
+      <div className="max-w-md w-full mx-auto my-auto py-8 relative z-10">
         <div className="card-deckle p-8 sm:p-10 relative overflow-hidden animate-scale-in text-center">
           <div className="washi-tape" />
           <div className="w-16 h-16 rounded-full border-4 border-clay border-t-transparent animate-spin mx-auto mb-6" aria-label="Creating room" />
@@ -56,7 +62,7 @@ export const CreateRoomPage: React.FC = () => {
           </div>
         </div>
       </div>
-      <footer className="text-center py-4 text-xs text-ink-500">©️ Mewn</footer>
+      <footer className="text-center py-4 text-xs text-ink-500 relative z-10">©️ Mewn</footer>
     </div>
   );
 };
