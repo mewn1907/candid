@@ -114,6 +114,8 @@ export function useTheme(): ThemeContextValue {
 
 export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
   const { theme, setTheme, themes } = useTheme();
+  const [open, setOpen] = useState(false);
+  const current = themes.find((t) => t.id === theme) ?? themes[0];
 
   if (compact) {
     return (
@@ -140,27 +142,58 @@ export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false
             );
           })}
         </div>
-        {/* Mobile: big tappable slider — horizontal scroll, no dropdown, no clash */}
-        <div className="sm:hidden flex gap-2 overflow-x-auto pb-1 px-1 scrollbar-none snap-x snap-mandatory">
-          {themes.map((t) => {
-            const active = t.id === theme;
-            return (
-              <button
-                key={t.id}
-                onClick={() => setTheme(t.id)}
-                role="radio"
-                aria-checked={active}
-                aria-label={`${t.label} — ${t.hint}`}
-                className={`flex-shrink-0 snap-center flex flex-col items-center gap-1 p-2 rounded-organic-sm transition-all min-w-[68px] ${active ? 'bg-paper-200 ring-2 ring-clay scale-105 shadow-sm' : 'bg-paper-100/70 border border-paper-border/50 opacity-85'}`}
-              >
-                <span className={`w-11 h-11 rounded-full border-2 flex items-center justify-center text-base shadow-inner ${active ? 'border-clay' : 'border-white'}`} style={{ background: t.swatch }} aria-hidden="true">
-                  {t.emoji}
-                </span>
-                <span className={`text-xs font-medium leading-none ${active ? 'text-ink-900' : 'text-ink-700'}`}>{t.label}</span>
-              </button>
-            );
-          })}
+        {/* Mobile: polished dropdown — single pill → bottom sheet */}
+        <div className="sm:hidden flex justify-center">
+          <button
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-haspopup="dialog"
+            className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-paper-200 border border-paper-border shadow-cozy-sm text-ink-700 active:scale-[0.98] transition-transform"
+          >
+            <span className="w-8 h-8 rounded-full border border-white shadow-inner flex items-center justify-center text-sm" style={{ background: current.swatch }} aria-hidden="true">
+              {current.emoji}
+            </span>
+            <span className="text-sm font-medium">{current.label}</span>
+            <span className="text-[11px] font-mono text-ink-500">{current.hint.split('·')[0].trim()}</span>
+            <svg className={`w-3.5 h-3.5 text-ink-500 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+          </button>
         </div>
+        {open && (
+          <>
+            <button className="fixed inset-0 bg-ink-900/20 backdrop-blur-[1px] z-40 sm:hidden" onClick={() => setOpen(false)} aria-label="Close theme picker" />
+            <div className="fixed bottom-0 inset-x-0 z-50 sm:hidden bg-paper-100 border-t border-paper-border rounded-t-organic shadow-cozy-lg p-4 pb-6 animate-slide-up" role="dialog" aria-label="Pick wabi style">
+              <div className="w-10 h-1.5 rounded-full bg-paper-300 mx-auto mb-3" />
+              <div className="flex items-center justify-between mb-3 px-1">
+                <span className="text-xs font-semibold text-ink-700 uppercase tracking-wider">🎨 Wabi Style</span>
+                <button onClick={() => setOpen(false)} className="text-xs font-mono text-ink-500 px-3 py-1.5 rounded-full bg-paper-200 border border-paper-border">Close</button>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {themes.map((t) => {
+                  const active = t.id === theme;
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => {
+                        setTheme(t.id);
+                        setOpen(false);
+                      }}
+                      role="radio"
+                      aria-checked={active}
+                      className={`flex flex-col items-center gap-1.5 p-3 rounded-organic-sm transition-all ${active ? 'bg-paper-200 ring-2 ring-clay shadow-sm scale-[1.02]' : 'bg-white border border-paper-border/60 hover:bg-paper-200/60'}`}
+                    >
+                      <span className={`w-14 h-14 rounded-full border-2 flex items-center justify-center text-xl shadow-inner ${active ? 'border-clay' : 'border-white'}`} style={{ background: t.swatch }} aria-hidden="true">
+                        {t.emoji}
+                      </span>
+                      <span className={`text-sm font-medium ${active ? 'text-ink-900' : 'text-ink-700'}`}>{t.label}</span>
+                      <span className="text-[11px] text-ink-500 text-center leading-tight">{t.hint}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[11px] text-ink-500 text-center mt-3">Tap to switch — saved to this device</p>
+            </div>
+          </>
+        )}
       </div>
     );
   }
