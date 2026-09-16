@@ -1,7 +1,6 @@
-// ©️ Mewn
-
+// ©️ Mewn — Cozy
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useRoomContext } from './hooks/use-room-context';
 
 export const JoinRoomPage: React.FC = () => {
@@ -13,7 +12,6 @@ export const JoinRoomPage: React.FC = () => {
   function extractRoomId(raw: string): string {
     const trimmed = raw.trim();
     if (!trimmed) return '';
-    // If user pastes full invite link (https://.../join/XXXXXXXXXX), extract the 10-char code
     const m = trimmed.match(/[A-Za-z0-9_-]{10}/g);
     if (m) return m[m.length - 1];
     const noQuery = trimmed.split('?')[0].split('#')[0];
@@ -26,120 +24,54 @@ export const JoinRoomPage: React.FC = () => {
     if (!extracted) return;
     try {
       const result = await joinRoom(extracted);
-      if (result.success && result.room) {
-        navigate(`/room/${result.room.id}`, { replace: true });
-      }
-    } catch (err) {
-      console.error('Failed to join room:', err);
-    }
+      if (result.success && result.room) navigate(`/room/${result.room.id}`, { replace: true });
+    } catch (err) { console.error('Failed to join room:', err); }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await join(roomId);
-  };
+  const handleSubmit = async (e: React.FormEvent) => { e.preventDefault(); await join(roomId); };
 
-  // Invite-link flow: /join/:roomId auto-joins once (guarded for StrictMode).
   const autoJoinedRef = useRef(false);
   useEffect(() => {
-    if (linkRoomId && !autoJoinedRef.current) {
-      autoJoinedRef.current = true;
-      void join(linkRoomId);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (linkRoomId && !autoJoinedRef.current) { autoJoinedRef.current = true; void join(linkRoomId); }
   }, [linkRoomId]);
 
   return (
-    <div className="min-h-screen bg-surface-50 flex items-center justify-center px-4 animate-in">
-      <div className="card max-w-md w-full p-8">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-full bg-pine-100 flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-pine-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 3h6v6" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14L21 3" />
-            </svg>
-          </div>
-          <h2 className="text-heading-lg font-semibold text-surface-900">Join Room</h2>
-          <p className="text-body-md text-surface-600 mt-1">Enter the room ID shared with you</p>
-        </div>
-
-        {error && (
-          <div className="mb-6 animate-in" role="alert">
-            <div className="flex items-start gap-3 p-4 bg-stone-100 border border-surface-300 rounded-xl">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center">
-                <svg className="w-5 h-5 text-stone-600" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-medium text-stone-700">Error</p>
-                <p className="text-sm text-stone-600 mt-1">{error}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="roomId" className="block text-body-sm font-medium text-surface-700 mb-2">
-              Room ID
-            </label>
-            <input
-              id="roomId"
-              type="text"
-              value={roomId}
-              onChange={(e) => setRoomId(e.target.value)}
-              onPaste={(e) => {
-                const pasted = e.clipboardData.getData('text');
-                const extracted = extractRoomId(pasted);
-                if (extracted !== pasted) {
-                  e.preventDefault();
-                  setRoomId(extracted);
-                }
-              }}
-              placeholder="Enter room ID or paste invite link"
-              className="input text-center text-heading-sm tracking-widest"
-              maxLength={200}
-              autoFocus
-              required
-              autoComplete="off"
-              autoCapitalize="off"
-              autoCorrect="off"
-              spellCheck={false}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading || !roomId.trim()}
-            className="btn-success btn-lg w-full"
-          >
-            {loading ? (
-              <>
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                <span>Joining...</span>
-              </>
-            ) : (
-              <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 3h6v6" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14L21 3" />
-                </svg>
-                <span>Join Room</span>
-              </>
-            )}
-          </button>
-        </form>
-
-        <p className="mt-8 text-center text-caption text-surface-400">
-          ©️ Mewn
-        </p>
+    <div className="relative min-h-screen bg-paper-100 bg-paper-grain flex flex-col justify-between p-6">
+      <div className="max-w-md w-full mx-auto pt-4">
+        <Link to="/" className="inline-flex items-center gap-2 text-ink-700 hover:text-ink-900 text-sm font-medium">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+          <span>Back to warm lobby</span>
+        </Link>
       </div>
+      <div className="max-w-md w-full mx-auto my-auto py-8">
+        <div className="card-deckle p-8 sm:p-10 relative overflow-hidden animate-scale-in">
+          <div className="washi-tape !rotate-[1deg] !bg-pine-light/40" />
+          <div className="text-center mb-8">
+            <div className="w-14 h-14 rounded-organic bg-pine text-cream mx-auto flex items-center justify-center shadow-cozy mb-4 rotate-[2deg]">
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-display font-light text-ink-900 mb-2">Join the Booth</h1>
+            <p className="text-sm text-ink-700 leading-relaxed">Step inside. Your friend is waiting on the other side of the lens.</p>
+          </div>
+          {error && (
+            <div className="p-3 rounded-organic-sm bg-terracotta/10 border border-terracotta/30 text-terracotta text-sm text-center mb-6" role="alert">{error}</div>
+          )}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label htmlFor="roomId" className="block text-xs font-semibold text-ink-700 uppercase tracking-wider mb-2">10-Character Room Code</label>
+              <div className="relative">
+                <input id="roomId" type="text" value={roomId} onChange={(e) => setRoomId(e.target.value)} onPaste={(e) => { const pasted = e.clipboardData.getData('text'); const extracted = extractRoomId(pasted); if (extracted !== pasted) { e.preventDefault(); setRoomId(extracted); } }} placeholder="e.g. k9XzL2qM7p or paste link" className="input font-mono tracking-widest text-center text-lg pr-10" maxLength={200} required autoFocus={!linkRoomId} autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} />
+                <svg className="w-4 h-4 text-ink-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 7a2 2 0 012 2v6a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2h6" /></svg>
+              </div>
+              <p className="text-[11px] text-ink-500 font-mono mt-2 text-center">Paste full invite link — we’ll extract the code</p>
+            </div>
+            <button type="submit" disabled={loading || !roomId.trim()} className="btn-success w-full text-base py-4">
+              {loading ? <><svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg><span>Connecting Lens…</span></> : <span>Step Inside Booth</span>}
+            </button>
+          </form>
+        </div>
+      </div>
+      <footer className="text-center py-4 text-xs text-ink-500">©️ Mewn</footer>
     </div>
   );
 };

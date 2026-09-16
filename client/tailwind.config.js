@@ -1,11 +1,50 @@
-// ©️ Mewn
-
+// ©️ Mewn — Cozy Wabi-Sabi + Slick Animation (Stitch)
 export default {
-  content: ["./src/**/*.{ts,tsx,js,jsx}"],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
-        // Wabi Sabi colors - natural, imperfect, earthy tones
+        // New cozy paper system (Stitch)
+        paper: {
+          50: '#FDFBF7',
+          100: '#FDF8F0',
+          200: '#F5EFEB',
+          300: '#EFE7DE',
+          400: '#E2D5C3',
+          border: '#E8DCCB',
+        },
+        clay: {
+          DEFAULT: '#C48849',
+          hover: '#B3783C',
+          light: '#E5BF94',
+          subtle: '#FAF0E4',
+          dark: '#8C5A2B',
+        },
+        pine: {
+          DEFAULT: '#3E4D3A',
+          hover: '#313E2E',
+          light: '#5A6850',
+          subtle: '#EDF1EB',
+          dark: '#242D22',
+          100: '#eef0e9',
+          600: '#3E4D3A',
+          700: '#313E2E',
+          800: '#242D22',
+        },
+        ink: {
+          950: '#141412',
+          900: '#1C1B18',
+          700: '#403E3A',
+          500: '#736F68',
+          400: '#A19C91',
+          200: '#DDD8CE',
+        },
+        terracotta: {
+          DEFAULT: '#BD5338',
+          subtle: '#FBF0ED',
+        },
+        cream: '#FFFDF9',
+        // Back-compat keep old tokens so existing classes don't break
         wabi: {
           50: '#faf8f5',
           100: '#f5f0e8',
@@ -19,7 +58,6 @@ export default {
           900: '#8e6e42',
           950: '#705a33',
         },
-        // Wabi Sabi surface colors - weathered, natural tones
         surface: {
           50: '#fafaf9',
           100: '#f5f5f4',
@@ -33,7 +71,6 @@ export default {
           900: '#18181b',
           950: '#09090b',
         },
-        // Wabi Sabi accent colors - subtle, natural
         accent: {
           sand: '#f5d8ab',
           clay: '#c48849',
@@ -44,7 +81,6 @@ export default {
           blue: '#a1a1aa',
           amber: '#c48849',
         },
-        // Back-compat: candid alias to wabi so old components keep working
         candid: {
           50: '#faf8f5',
           100: '#f5f0e8',
@@ -58,27 +94,22 @@ export default {
           900: '#8e6e42',
           950: '#705a33',
         },
-        pine: {
-          100: '#eef0e9',
-          600: '#6b7a5c',
-          700: '#5a6850',
-          800: '#4a5542',
-        },
         stone: {
           100: '#e7e5e4',
           600: '#8a8886',
           700: '#787674',
           800: '#57534e',
         },
-        clay: {
+        clayOld: {
           100: '#f5e8d5',
           800: '#8e6e42',
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Inter', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+        handwritten: ['Caveat', 'cursive'],
       },
       fontSize: {
         'display-xl': ['4.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
@@ -92,24 +123,13 @@ export default {
         'body-lg': ['1.125rem', { lineHeight: '1.6', letterSpacing: '0' }],
         'body-md': ['1rem', { lineHeight: '1.6', letterSpacing: '0' }],
         'body-sm': ['0.875rem', { lineHeight: '1.5', letterSpacing: '0' }],
-        'caption': ['0.75rem', { lineHeight: '1.5', letterSpacing: '0.01em' }],
-      },
-      spacing: {
-        'space-0': '0',
-        'space-1': '0.25rem',
-        'space-2': '0.5rem',
-        'space-3': '0.75rem',
-        'space-4': '1rem',
-        'space-5': '1.25rem',
-        'space-6': '1.5rem',
-        'space-8': '2rem',
-        'space-10': '2.5rem',
-        'space-12': '3rem',
-        'space-16': '4rem',
-        'space-20': '5rem',
-        'space-24': '6rem',
+        caption: ['0.75rem', { lineHeight: '1.5', letterSpacing: '0.01em' }],
       },
       borderRadius: {
+        'organic-sm': '14px 12px 16px 13px',
+        organic: '24px 20px 26px 22px',
+        'organic-lg': '32px 28px 34px 26px',
+        deckle: '6px 4px 5px 7px',
         'radius-sm': '0.375rem',
         'radius-md': '0.5rem',
         'radius-lg': '0.75rem',
@@ -118,6 +138,11 @@ export default {
         'radius-full': '9999px',
       },
       boxShadow: {
+        'cozy-sm': '0 2px 8px -2px rgba(28, 27, 24, 0.06), 0 1px 3px 0 rgba(28, 27, 24, 0.04)',
+        cozy: '0 10px 25px -4px rgba(62, 77, 58, 0.08), 0 4px 12px -2px rgba(28, 27, 24, 0.05)',
+        'cozy-lg': '0 20px 35px -6px rgba(44, 38, 30, 0.12), 0 8px 16px -4px rgba(28, 27, 24, 0.06)',
+        polaroid: '0 16px 32px -4px rgba(28, 27, 24, 0.14), 0 4px 12px -1px rgba(196, 136, 73, 0.08)',
+        'inner-lens': 'inset 0 2px 10px rgba(0,0,0,0.3)',
         'shadow-sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
         'shadow-md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
         'shadow-lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
@@ -126,78 +151,53 @@ export default {
         'shadow-glow': '0 0 20px rgb(183 162 113 / 0.35)',
         'shadow-glow-green': '0 0 20px rgb(107 122 92 / 0.35)',
       },
-      animation: {
-        'fade-in': 'fadeIn 200ms ease-out',
-        'fade-out': 'fadeOut 150ms ease-in',
-        'slide-up': 'slideUp 300ms ease-out',
-        'slide-down': 'slideDown 300ms ease-out',
-        'slide-in-right': 'slideInRight 300ms ease-out',
-        'scale-in': 'scaleIn 200ms ease-out',
-        'scale-out': 'scaleOut 150ms ease-in',
-        'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
-        'bounce-soft': 'bounceSoft 1s ease-in-out infinite',
-        'spin-slow': 'spin 3s linear infinite',
-        'shimmer': 'shimmer 2s ease-in-out infinite',
-      },
       keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        fadeOut: {
-          '0%': { opacity: '1' },
-          '100%': { opacity: '0' },
-        },
-        slideUp: {
-          '0%': { transform: 'translateY(10px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        slideDown: {
-          '0%': { transform: 'translateY(-10px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        slideInRight: {
-          '0%': { transform: 'translateX(100%)', opacity: '0' },
-          '100%': { transform: 'translateX(0)', opacity: '1' },
-        },
-        scaleIn: {
-          '0%': { transform: 'scale(0.95)', opacity: '0' },
-          '100%': { transform: 'scale(1)', opacity: '1' },
-        },
-        scaleOut: {
-          '0%': { transform: 'scale(1)', opacity: '1' },
-          '100%': { transform: 'scale(0.95)', opacity: '0' },
-        },
-        pulseSoft: {
-          '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0.7' },
-        },
-        bounceSoft: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-4px)' },
-        },
-        shimmer: {
-          '0%': { backgroundPosition: '-200% 0' },
-          '100%': { backgroundPosition: '200% 0' },
-        },
+        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+        slideUp: { '0%': { opacity: '0', transform: 'translateY(16px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+        drift: { '0%, 100%': { transform: 'translateY(0px) rotate(-1.5deg)' }, '50%': { transform: 'translateY(-8px) rotate(0.5deg)' } },
+        driftAlt: { '0%, 100%': { transform: 'translateY(0px) rotate(1.8deg)' }, '50%': { transform: 'translateY(-10px) rotate(-0.5deg)' } },
+        shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
+        pulseSoft: { '0%, 100%': { opacity: '1', transform: 'scale(1)' }, '50%': { opacity: '0.82', transform: 'scale(0.985)' } },
+        bounceSoft: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-4px)' } },
+        scaleIn: { '0%': { opacity: '0', transform: 'scale(0.92)' }, '100%': { opacity: '1', transform: 'scale(1)' } },
+        countdownPop: { '0%': { opacity: '0', transform: 'scale(1.45) blur(4px)' }, '60%': { opacity: '1', transform: 'scale(0.96)' }, '100%': { opacity: '1', transform: 'scale(1)' } },
+        flash: { '0%': { opacity: '0' }, '30%': { opacity: '0.92' }, '100%': { opacity: '0' } },
+        slideDown: { '0%': { transform: 'translateY(-10px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+        slideInRight: { '0%': { transform: 'translateX(100%)', opacity: '0' }, '100%': { transform: 'translateX(0)', opacity: '1' } },
+        scaleOut: { '0%': { transform: 'scale(1)', opacity: '1' }, '100%': { transform: 'scale(0.95)', opacity: '0' } },
+        fadeOut: { '0%': { opacity: '1' }, '100%': { opacity: '0' } },
       },
-      transitionDuration: {
-        'fast': '150ms',
-        'normal': '200ms',
-        'slow': '300ms',
-        'slower': '500ms',
+      animation: {
+        'fade-in': 'fadeIn 400ms cubic-bezier(0.22, 1, 0.36, 1) forwards',
+        'slide-up': 'slideUp 450ms cubic-bezier(0.22, 1, 0.36, 1) forwards',
+        'drift-slow': 'drift 7s ease-in-out infinite',
+        'drift-alt': 'driftAlt 8.5s ease-in-out infinite',
+        shimmer: 'shimmer 2.2s ease-in-out infinite',
+        'pulse-soft': 'pulseSoft 3s ease-in-out infinite',
+        'bounce-soft': 'bounceSoft 400ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'scale-in': 'scaleIn 350ms cubic-bezier(0.22, 1, 0.36, 1) forwards',
+        countdown: 'countdownPop 600ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+        'shutter-flash': 'flash 250ms ease-out forwards',
+        'spin-slow': 'spin 3s linear infinite',
+        'fade-out': 'fadeOut 150ms ease-in forwards',
       },
       transitionTimingFunction: {
+        organic: 'cubic-bezier(0.22, 1, 0.36, 1)',
+        spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
         'ease-in-out': 'cubic-bezier(0.4, 0, 0.2, 1)',
         'ease-out': 'cubic-bezier(0, 0, 0.2, 1)',
         'ease-in': 'cubic-bezier(0.4, 0, 1, 1)',
-        'bounce': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        bounce: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
       },
-      backdropBlur: {
-        'xs': '2px',
+      transitionDuration: {
+        fast: '150ms',
+        normal: '200ms',
+        slow: '300ms',
+        slower: '500ms',
       },
+      backdropBlur: { xs: '2px' },
     },
   },
   plugins: [],
   important: true,
-};
+}

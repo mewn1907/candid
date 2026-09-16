@@ -269,10 +269,10 @@ export const RoomView: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-surface-50 flex items-center justify-center">
+      <div className="min-h-screen bg-paper-100 bg-paper-grain flex items-center justify-center">
         <div className="flex flex-col items-center gap-4 animate-in">
-          <div className="w-12 h-12 rounded-full border-4 border-wabi-500 border-t-transparent animate-spin" />
-          <p className="text-body-md text-surface-600">Connecting...</p>
+          <div className="w-12 h-12 rounded-full border-4 border-clay border-t-transparent animate-spin" />
+          <p className="text-body-md text-ink-700">Connecting...</p>
         </div>
       </div>
     );
@@ -280,8 +280,9 @@ export const RoomView: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-surface-50 flex items-center justify-center px-4 animate-in">
-        <div className="card max-w-md w-full p-8 text-center">
+      <div className="min-h-screen bg-paper-100 bg-paper-grain flex items-center justify-center px-4 animate-in">
+        <div className="card-deckle max-w-md w-full p-8 text-center relative overflow-hidden">
+          <div className="washi-tape" />
           <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -302,16 +303,16 @@ export const RoomView: React.FC = () => {
 
   if (!currentRoom) {
     return (
-      <div className="min-h-screen bg-surface-50 flex items-center justify-center">
+      <div className="min-h-screen bg-paper-100 bg-paper-grain flex items-center justify-center">
         <div className="flex flex-col items-center gap-4 animate-in">
-          <div className="w-12 h-12 rounded-full border-4 border-wabi-500 border-t-transparent animate-spin" />
-          <p className="text-body-md text-surface-600">Loading room...</p>
+          <div className="w-12 h-12 rounded-full border-4 border-clay border-t-transparent animate-spin" />
+          <p className="text-body-md text-ink-700">Loading room...</p>
         </div>
       </div>
     );
   }
   return (
-    <div className="min-h-screen bg-surface-50 flex flex-col py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-paper-100 bg-paper-grain flex flex-col py-8 px-4 sm:px-6 lg:px-8">
       {flash && (
         <div className="fixed inset-0 bg-white z-50 pointer-events-none" style={{ animation: 'fadeIn 60ms ease-out' }} aria-hidden="true" />
       )}
