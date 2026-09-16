@@ -1,4 +1,4 @@
-# Candid - Two people. One virtual frame.
+# Candid - Miles apart. Frames together.
 
 [![Open in GitHub Codespaces](https://img.shields.io/badge/Open%20in-GitHub%20Codespaces-24292e.svg)](https://codespaces.new/mewn1907/candid)
 

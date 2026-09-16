@@ -6,7 +6,7 @@ set -e
 # Print logo
 echo "╔════════════════════════════════════════════════════════╗"
 echo "║       ©️  Mewn                                      ║"
-echo "║       Candid - Two people. One virtual frame.      ║"
+echo "║       Candid - Miles apart. Frames together.      ║"
 echo "╚════════════════════════════════════════════════════════╝"
 echo ""
 echo "Installing Candid dependencies..."

@@ -1,7 +1,7 @@
 {
   "name": "candid-server",
   "version": "0.0.1",
-  "description": "Candid backend - Two people. One virtual frame.",
+  "description": "Candid backend - Miles apart. Frames together.",
   "copyright": "©️ Mewn",
   "private": true,
   "type": "module",

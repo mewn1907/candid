@@ -1,7 +1,7 @@
 # CANDID — Product & Technical Specification
 
 **Product:** Candid
-**Tagline:** Two people. One virtual frame.
+**Tagline:** Miles apart. Frames together.
 **Copyright:** ©️ Mewn
 
 ---

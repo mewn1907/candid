@@ -18,7 +18,7 @@ export const LandingPage: React.FC = () => {
             </svg>
           </div>
           <h1 className="text-display-lg font-light text-surface-900 tracking-tight">Candid</h1>
-          <p className="text-heading-md text-surface-700 max-w-lg mx-auto font-light leading-relaxed">Two people. One virtual frame.</p>
+          <p className="text-heading-md text-surface-700 max-w-lg mx-auto font-light leading-relaxed">Miles apart. Frames together.</p>
           <p className="text-body-lg text-surface-600 max-w-md mx-auto font-light leading-relaxed">Connect with someone far away and capture a shared moment together in an imperfect, beautiful way.</p>
         </header>
 
@@ -53,8 +53,6 @@ export const LandingPage: React.FC = () => {
               <span>©️ Mewn</span>
               <span className="w-1 h-1 rounded-full bg-surface-300" aria-hidden="true" />
               <span>Built with imperfection</span>
-              <span className="w-1 h-1 rounded-full bg-surface-300" aria-hidden="true" />
-              <span>Wabi Sabi design</span>
             </p>
             <p className="text-caption text-surface-400 max-w-lg mx-auto">
               Embracing the beauty of imperfections, transience, and simplicity in human connection.
