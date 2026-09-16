@@ -163,17 +163,20 @@ export const RoomView: React.FC = () => {
   const [editedSingle, setEditedSingle] = useState<string | null>(null);
   const [editedBurst, setEditedBurst] = useState<Record<number, string>>({});
   const [editedCollage, setEditedCollage] = useState<string | null>(null);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [hapticEnabled, setHapticEnabled] = useState(true);
 
-  // Extra feature 4: sound + flash
+  // Extra: shutter sounds + haptic (optional)
   const [flash, setFlash] = useState(false);
   useEffect(() => {
     if (captureState === 'capturing') {
-      playShutter();
+      if (soundEnabled) playShutter();
+      if (hapticEnabled && 'vibrate' in navigator) (navigator as any).vibrate?.([30, 40, 80]);
       setFlash(true);
       const t = setTimeout(() => setFlash(false), 280);
       return () => clearTimeout(t);
     }
-  }, [captureState]);
+  }, [captureState, soundEnabled, hapticEnabled]);
 
   const handleRetakeAll = () => {
     setGalleryIndex(0);
@@ -290,10 +293,13 @@ export const RoomView: React.FC = () => {
   useEffect(() => {
     if (captureState === 'countdown' && countdownDisplay !== null && countdownDisplay !== prevCountdownRef.current) {
       prevCountdownRef.current = countdownDisplay;
-      if (countdownDisplay > 0) playTick();
+      if (countdownDisplay > 0) {
+        if (soundEnabled) playTick();
+        if (hapticEnabled && 'vibrate' in navigator) (navigator as any).vibrate?.(18);
+      }
     }
     if (captureState !== 'countdown') prevCountdownRef.current = null;
-  }, [captureState, countdownDisplay]);
+  }, [captureState, countdownDisplay, soundEnabled, hapticEnabled]);
 
   if (!roomId) {
     return null;
@@ -954,6 +960,8 @@ export const RoomView: React.FC = () => {
                       <label className="flex items-center gap-2 p-2 rounded-organic-sm bg-white border border-paper-border cursor-pointer"><input type="checkbox" checked={bgBlur} onChange={e=>setBgBlur(e.target.checked)} className="accent-clay" /> Cozy blur bg</label>
                       <label className="flex items-center gap-2 p-2 rounded-organic-sm bg-white border border-paper-border cursor-pointer"><input type="checkbox" checked={doubleExposure} onChange={e=>setDoubleExposure(e.target.checked)} className="accent-clay" /> Double exposure</label>
                       <label className="flex items-center gap-2 p-2 rounded-organic-sm bg-white border border-paper-border cursor-pointer"><input type="checkbox" checked={boomerang} onChange={e=>setBoomerang(e.target.checked)} className="accent-clay" /> Boomerang clip</label>
+                      <label className="flex items-center gap-2 p-2 rounded-organic-sm bg-white border border-paper-border cursor-pointer"><input type="checkbox" checked={soundEnabled} onChange={e=>setSoundEnabled(e.target.checked)} className="accent-clay" /> Shutter sounds</label>
+                      <label className="flex items-center gap-2 p-2 rounded-organic-sm bg-white border border-paper-border cursor-pointer"><input type="checkbox" checked={hapticEnabled} onChange={e=>setHapticEnabled(e.target.checked)} className="accent-clay" /> Haptic</label>
                     </div>
                     <div className="mt-3 flex items-center gap-2">
                       <span className="text-[11px] text-ink-500">Washi tape</span>
