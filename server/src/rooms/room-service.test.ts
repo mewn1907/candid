@@ -3,7 +3,7 @@
 import { describe, it, expect } from 'vitest';
 import { config } from '../config';
 import { getRoom } from './room-registry';
-import { handleCreateRoom, handleJoinRoom, handleRejoinRoom } from './room-service';
+import { handleCreateRoom, handleJoinRoom, handleRejoinRoom, purgeStaleIpCreations } from './room-service';
 
 let counter = 0;
 const testIp = (): string => `10.99.0.${(counter++ % 250) + 1}`;
@@ -53,6 +53,16 @@ describe('room-service', () => {
     const rejected = handleCreateRoom(ip);
     expect(rejected.success).toBe(false);
     expect(rejected.message).toMatch(/limit/i);
+  });
+
+  it('purges stale per-IP entries so capped IPs recover', () => {
+    const ip = `10.96.0.${counter++}`;
+    for (let i = 0; i < config.roomLimitPerIp; i++) {
+      expect(handleCreateRoom(ip).success).toBe(true);
+    }
+    expect(handleCreateRoom(ip).success).toBe(false);
+    expect(purgeStaleIpCreations(0)).toBeGreaterThan(0);
+    expect(handleCreateRoom(ip).success).toBe(true);
   });
 
   it('treats a non-positive per-IP cap as unlimited', () => {

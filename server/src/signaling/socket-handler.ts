@@ -7,6 +7,7 @@ import { setupWebRTCHandlers } from './webrtc-handlers';
 import { setupCaptureHandlers } from './capture-handlers';
 import { cleanupExpiredRooms } from '../rooms/room-registry';
 import { purgeStaleCaptures } from './capture-handlers';
+import { purgeStaleIpCreations } from '../rooms/room-service';
 import { checkSocketRateLimit, cleanupSocketRateLimit, getRateLimitConfig } from './rate-limiter';
 
 type TypedServer = Server<ClientToServerEvents, ServerToClientEvents>;
@@ -75,6 +76,10 @@ export function setupSocketHandlers(io: TypedServer): void {
     const purged = purgeStaleCaptures();
     if (purged > 0) {
       console.log(`[Capture] Purged ${purged} stale captures`);
+    }
+    const purgedIps = purgeStaleIpCreations();
+    if (purgedIps > 0) {
+      console.log(`[RoomService] Purged ${purgedIps} stale IP entries`);
     }
   }, 60000);
 }

@@ -27,6 +27,23 @@ function isRoomCreationAllowed(clientIp: string): boolean {
   return true;
 }
 
+// Drops IPs whose creations all fell outside the window, so the map
+// cannot grow unboundedly over server lifetime.
+export function purgeStaleIpCreations(windowMs: number = config.roomExpirySeconds * 1000): number {
+  const windowStart = Date.now() - windowMs;
+  let purged = 0;
+  for (const [ip, timestamps] of roomCreationsByIp.entries()) {
+    const fresh = timestamps.filter((t) => t > windowStart);
+    if (fresh.length === 0) {
+      roomCreationsByIp.delete(ip);
+      purged++;
+    } else if (fresh.length !== timestamps.length) {
+      roomCreationsByIp.set(ip, fresh);
+    }
+  }
+  return purged;
+}
+
 export function handleCreateRoom(clientIp?: string): CreateRoomResult {
   if (clientIp && !isRoomCreationAllowed(clientIp)) {
     return {

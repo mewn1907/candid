@@ -101,7 +101,7 @@ M1 Landing/Rooms UI ✅ → M2 Room Server ✅ → M3 Camera ✅ → M4 WebRTC �
 - **Security / Privacy (M9):**
   - Helmet security headers with deliberate CSP (CORP/COEP off: split-origin client/server + Socket.IO polling)
   - `@fastify/rate-limit@9` + `@fastify/helmet@11` pinned for Fastify 4 (v11+ / v13+ require Fastify 5)
-  - Per-IP room creation cap (`ROOM_LIMIT_PER_IP`, sliding window) enforced in room-service
+  - Per-IP room creation cap (`ROOM_LIMIT_PER_IP`, sliding window) enforced in room-service, stale IP entries purged on the cleanup interval
   - Strict room-ID validation (nanoid 10-char alphabet) on all socket payloads; SDP (50k) and ICE candidate (10k) size caps
   - Server tests (28 passing): registry, service, validation, socket rate limiter; `vitest.config.ts` prefers `.ts` over stale tsc `.js` artifacts
 
@@ -154,5 +154,5 @@ v1 final verification (per CANDID.md §84):
 - `npm run lint` - PASSES (client + server, warnings only)
 - `npm run build` - PASSES (client + server)
 - `npm run dev` - Both client and server start successfully
-- `npx vitest run` (server) - 35/35 PASS
+- `npx vitest run` (server) - 41/41 PASS
 - Headless E2E smoke - create→join×2→presence→countdown→execute→relay→result PASS
