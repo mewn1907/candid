@@ -72,14 +72,19 @@ const RoomContext = createContext<RoomContextType | undefined>(undefined);
 function normalizeApiUrl(url: string): string {
   const trimmed = url.trim().replace(/\/$/, '');
   if (!trimmed) return 'http://localhost:8080';
-  // Already absolute URL
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  // Absolute URL — but still fallback localhost on Vercel to deployed Render host
+  if (/^https?:\/\//i.test(trimmed)) {
+    const isLocalAbsolute = trimmed.includes('localhost');
+    if (isLocalAbsolute && typeof window !== 'undefined' && window.location.hostname.endsWith('vercel.app')) {
+      return 'https://candid-server-hb32.onrender.com';
+    }
+    return trimmed;
+  }
   // Render fromService may inject short host like candid-server-hb32 without .onrender.com
   let host = trimmed;
   if (!host.includes('.') && /^[a-z0-9-]+$/i.test(host)) {
     host = `${host}.onrender.com`;
   }
-  // Fallback for Vercel builds where VITE_API_URL was not set (still localhost) but we're on vercel.app
   const isLocal = host === 'localhost:8080' || host === 'localhost' || host.includes('localhost');
   if (isLocal && typeof window !== 'undefined' && window.location.hostname.endsWith('vercel.app')) {
     return 'https://candid-server-hb32.onrender.com';
