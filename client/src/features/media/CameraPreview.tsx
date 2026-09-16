@@ -7,9 +7,10 @@ interface CameraPreviewProps {
   onError?: (error: { code: string; message: string }) => void;
   onStreamReady?: (stream: MediaStream) => void;
   filterStyle?: string;
+  filterId?: string;
 }
 
-export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamReady, filterStyle }) => {
+export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamReady, filterStyle, filterId }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const {
     stream,
@@ -177,6 +178,11 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamR
             {exposureHint && (
               <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-caption font-medium bg-white/90 text-surface-700 backdrop-blur-sm border border-white/50">
                 {exposureHint}
+              </div>
+            )}
+            {filterId && filterId !== 'natural' && (
+              <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-clay/85 text-cream text-[10px] font-mono uppercase tracking-wider backdrop-blur-sm border border-white/20 shadow-sm">
+                {filterId}
               </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-surface-900/60 via-transparent to-transparent pointer-events-none" />

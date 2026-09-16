@@ -11,7 +11,7 @@ import { PhotoEditor } from '../capture/PhotoEditor';
 import { buildPolaroid } from '../capture/polaroid';
 import { playTick, playShutter } from '../capture/sounds';
 import { copyImageToClipboard, shareImage } from '../capture/share';
-import { canvasFilterFor } from '../capture/filters';
+import { canvasFilterFor, PHOTO_FILTERS } from '../capture/filters';
 
 export const RoomView: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -456,6 +456,7 @@ export const RoomView: React.FC = () => {
                   onError={setCameraError}
                   onStreamReady={handleStreamReady}
                   filterStyle={canvasFilterFor(filter)}
+                  filterId={filter}
                 />
 
                 <RemoteVideo
@@ -465,7 +466,10 @@ export const RoomView: React.FC = () => {
                 />
               </div>
               {filter !== 'natural' && (
-                <p className="text-caption text-center text-surface-500">Preview: {filter} filter will be applied at capture</p>
+                <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-full bg-clay-subtle border border-clay/20 w-fit mx-auto animate-in">
+                  <span className="w-3 h-3 rounded-full border border-white shadow-sm" style={{ background: PHOTO_FILTERS.find(f=>f.id===filter)?.swatch as any || '#c7b48f' }} />
+                  <span className="text-caption font-medium text-clay-dark">Preview: {filter} — warm live filter active</span>
+                </div>
               )}
 
               {captureState === 'result' && composedImage && (
