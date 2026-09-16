@@ -44,15 +44,15 @@ export const StarsBackground: React.FC = () => {
         starsRef.current = Array.from({ length: newCount }, () => ({
           x: Math.random() * width,
           y: Math.random() * height,
-          radius: Math.random() * 1.6 + 0.7,
-          baseAlpha: Math.random() * 0.45 + 0.4,
+          radius: Math.random() * 2.2 + 1.4,
+          baseAlpha: Math.random() * 0.35 + 0.55,
           twinkleSpeed: Math.random() * 0.022 + 0.008,
           twinklePhase: Math.random() * Math.PI * 2,
           vx: (Math.random() - 0.5) * 0.22,
           vy: (Math.random() - 0.55) * 0.32,
           zigAmp: Math.random() * 0.9 + 0.4,
           zigSpeed: Math.random() * 0.0018 + 0.0007,
-          isCross: Math.random() > 0.72,
+          isCross: Math.random() > 0.68,
         }));
       }
     };
@@ -61,15 +61,15 @@ export const StarsBackground: React.FC = () => {
     const stars: Star[] = Array.from({ length: getStarCount(width, height) }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      radius: Math.random() * 1.6 + 0.7,
-      baseAlpha: Math.random() * 0.45 + 0.4,
+      radius: Math.random() * 2.2 + 1.4,
+      baseAlpha: Math.random() * 0.35 + 0.55,
       twinkleSpeed: Math.random() * 0.022 + 0.008,
       twinklePhase: Math.random() * Math.PI * 2,
       vx: (Math.random() - 0.5) * 0.22,
       vy: (Math.random() - 0.55) * 0.32,
       zigAmp: Math.random() * 0.9 + 0.4,
       zigSpeed: Math.random() * 0.0018 + 0.0007,
-      isCross: Math.random() > 0.72,
+      isCross: Math.random() > 0.68,
     }));
     starsRef.current = stars;
 
