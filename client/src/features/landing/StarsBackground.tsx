@@ -174,7 +174,7 @@ export const StarsBackground: React.FC = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0 opacity-90"
+      className="hidden sm:block fixed inset-0 pointer-events-none z-0 opacity-90"
       aria-hidden="true"
     />
   );
