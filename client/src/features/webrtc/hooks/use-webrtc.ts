@@ -220,21 +220,43 @@ export function useWebRTC(
     }
   }, []);
 
-  // Update local tracks when stream changes
+  // Update local tracks when stream changes — and renegotiate so remote sees new video
   useEffect(() => {
     const pc = peerConnectionRef.current;
     const stream = localStreamRef.current;
+    const socket = socketRef.current;
+    const roomId = currentRoomIdRef.current;
+    const localId = localParticipantIdRef.current;
     if (pc && stream) {
-      // Remove old video tracks
       pc.getSenders().forEach((sender) => {
         if (sender.track?.kind === 'video') {
-          pc.removeTrack(sender);
+          try { pc.removeTrack(sender); } catch {}
         }
       });
-      // Add new video tracks
       stream.getVideoTracks().forEach((track) => {
         pc.addTrack(track, stream);
       });
+      // If we already have a stable connection, renegotiate so the other peer gets our new track
+      if (pc.signalingState === 'stable' && socket && roomId && localId) {
+        // Small delay to let track addition settle
+        setTimeout(() => {
+          const curPc = peerConnectionRef.current;
+          const curSocket = socketRef.current;
+          const curRoomId = currentRoomIdRef.current;
+          const curLocalId = localParticipantIdRef.current;
+          if (!curPc || !curSocket || !curRoomId || !curLocalId) return;
+          if (curPc.signalingState !== 'stable') return;
+          curPc.createOffer({ iceRestart: false }).then((offer) => curPc.setLocalDescription(offer).then(() => {
+            const target = curLocalId === 'A' ? 'B' : 'A';
+            curSocket.emit('webrtc:offer', {
+              roomId: curRoomId,
+              to: target,
+              offer: curPc.localDescription!.toJSON(),
+            } as WebRTCOfferPayload);
+            console.log('[WebRTC] Renegotiation offer sent after localStream update');
+          })).catch((e) => console.error('[WebRTC] Renegotiation failed', e));
+        }, 200);
+      }
     }
   }, [localStream]);
 

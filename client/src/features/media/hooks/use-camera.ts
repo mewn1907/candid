@@ -28,6 +28,8 @@ export function useCamera(): UseCameraReturn {
   const [loading, setLoading] = useState(false);
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const facingModeRef = useRef<'user' | 'environment'>('user');
   const permissionStateRef = useRef<PermissionState>('prompt');
 
   const mapError = useCallback((err: Error): CameraError => {
@@ -83,7 +85,7 @@ export function useCamera(): UseCameraReturn {
   }, [checkPermission]);
 
   const start = useCallback(async (constraints?: Partial<CameraConstraints>) => {
-    if (stream) {
+    if (streamRef.current) {
       return;
     }
 
@@ -97,11 +99,12 @@ export function useCamera(): UseCameraReturn {
         video: {
           ...DEFAULT_CONSTRAINTS.video,
           ...constraints?.video,
-          facingMode: constraints?.video?.facingMode ?? facingMode,
+          facingMode: constraints?.video?.facingMode ?? facingModeRef.current,
         },
       };
 
       const mediaStream = await navigator.mediaDevices.getUserMedia(mergedConstraints);
+      streamRef.current = mediaStream;
       setStream(mediaStream);
 
       if (videoRef.current) {
@@ -115,34 +118,64 @@ export function useCamera(): UseCameraReturn {
     } finally {
       setLoading(false);
     }
-  }, [stream, facingMode, mapError]);
+  }, [mapError]);
 
   const stop = useCallback(() => {
-    if (stream) {
-      stream.getTracks().forEach((track) => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => {
         track.stop();
       });
+      streamRef.current = null;
       setStream(null);
     }
     if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
-  }, [stream]);
+  }, []);
 
   const switchCamera = useCallback(async () => {
-    const newFacingMode = facingMode === 'user' ? 'environment' : 'user';
-    setFacingMode(newFacingMode);
-    if (stream) {
-      await stop();
-      await start({
+    if (loading) return;
+    const newFacingMode = facingModeRef.current === 'user' ? 'environment' : 'user';
+
+    setLoading(true);
+    setError(null);
+
+    // Stop old tracks immediately (no state round-trip, so one click works)
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+      setStream(null);
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: newFacingMode,
           width: { ideal: 1280 },
           height: { ideal: 720 },
         },
+        audio: false,
       });
+      facingModeRef.current = newFacingMode;
+      setFacingMode(newFacingMode);
+      streamRef.current = mediaStream;
+      setStream(mediaStream);
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+        await videoRef.current.play().catch(() => {});
+      }
+    } catch (err) {
+      const cameraError = mapError(err instanceof Error ? err : new Error(String(err)));
+      setError(cameraError);
+      throw cameraError;
+    } finally {
+      setLoading(false);
     }
-  }, [facingMode, stream, start, stop]);
+  }, [loading, mapError]);
 
   const clearError = useCallback(() => {
     setError(null);

@@ -98,8 +98,7 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamR
 
   const showPermissionDenied = error?.code === 'PERMISSION_DENIED';
 
-  // Live preview polish: grid, mirror, exposure hint (extra feature 1)
-  const [showGrid, setShowGrid] = useState(false);
+  // Live preview polish: mirror, exposure hint (extra feature 1)
   const [mirrored, setMirrored] = useState(true);
   const [exposureHint, setExposureHint] = useState<string | null>(null);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
@@ -233,21 +232,6 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamR
                 )}
               </div>
             )}
-            {showGrid && (
-              <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-                <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
-                  <div className="border-r border-white/20" />
-                  <div className="border-r border-white/20" />
-                  <div />
-                  <div className="border-r border-t border-white/20" />
-                  <div className="border-r border-t border-white/20" />
-                  <div className="border-t border-white/20" />
-                  <div className="border-r border-t border-white/20" />
-                  <div className="border-r border-t border-white/20" />
-                  <div className="border-t border-white/20" />
-                </div>
-              </div>
-            )}
             {exposureHint && (
               <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-caption font-medium bg-white/90 text-surface-700 backdrop-blur-sm border border-white/50">
                 {exposureHint}
@@ -259,25 +243,8 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamR
               </div>
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-surface-900/60 via-transparent to-transparent pointer-events-none" />
-            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between p-3">
-              <div className="flex items-center gap-3">
-                <span className="flex items-center gap-2 text-white text-sm font-medium px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-full">
-                  <span className="w-2 h-2 rounded-full bg-pine-600" aria-hidden="true" />
-                  {facingMode === 'user' ? 'Front Camera' : 'Back Camera'}
-                </span>
-              </div>
+            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-end p-3">
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setShowGrid((v) => !v)}
-                  className={`p-2 rounded-lg backdrop-blur-sm transition-colors ${showGrid ? 'bg-white text-surface-900' : 'bg-white/10 text-white/90 hover:text-white hover:bg-white/20'}`}
-                  aria-pressed={showGrid}
-                  aria-label="Toggle grid overlay"
-                  title="Grid"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z" />
-                  </svg>
-                </button>
                 <button
                   onClick={() => setMirrored((v) => !v)}
                   className={`p-2 rounded-lg backdrop-blur-sm transition-colors ${mirrored ? 'bg-white text-surface-900' : 'bg-white/10 text-white/90 hover:text-white hover:bg-white/20'}`}
@@ -294,9 +261,13 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamR
                   disabled={loading}
                   className="p-2 text-white/90 hover:text-white transition-colors bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label={facingMode === 'user' ? 'Switch to back camera' : 'Switch to front camera'}
+                  title="Switch camera"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 2l4 4-4 4" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 11v-1a4 4 0 014-4h14" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 22l-4-4 4-4" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13v1a4 4 0 01-4 4H3" />
                   </svg>
                 </button>
                 <button
