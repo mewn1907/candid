@@ -69,12 +69,27 @@ export const StarsBackground: React.FC = () => {
         const alpha = s.baseAlpha + Math.sin(s.twinklePhase) * 0.25;
         const clampedAlpha = Math.max(0.1, Math.min(1, alpha));
 
-        // Motion update
+        // Motion update — floating with gentle tail
         s.x += s.vx;
         s.y += s.vy;
         if (s.y < -10) s.y = height + 10;
         if (s.x < -10) s.x = width + 10;
         if (s.x > width + 10) s.x = -10;
+
+        // Floating tail — subtle comet trail behind each star
+        const tailLen = 14;
+        const tailX = s.x - s.vx * tailLen * 6;
+        const tailY = s.y - s.vy * tailLen * 6;
+        const tailGrad = ctx.createLinearGradient(tailX, tailY, s.x, s.y);
+        tailGrad.addColorStop(0, 'rgba(246,197,137,0)');
+        tailGrad.addColorStop(1, `rgba(246,197,137,${clampedAlpha * 0.38})`);
+        ctx.strokeStyle = tailGrad;
+        ctx.lineWidth = Math.max(0.8, s.radius * 0.55);
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(tailX, tailY);
+        ctx.lineTo(s.x, s.y);
+        ctx.stroke();
 
         // Draw star core
         ctx.fillStyle = goldenHues[Math.floor(s.radius * 3) % goldenHues.length];
