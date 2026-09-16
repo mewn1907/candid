@@ -42,7 +42,12 @@ function normalizeOrigin(origin: string): string {
   const trimmed = origin.trim();
   if (trimmed.length === 0) return trimmed;
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  return `https://${trimmed}`;
+  // Render fromService may inject short host like candid-client-xxxx
+  let host = trimmed;
+  if (!host.includes('.') && /^[a-z0-9-]+$/i.test(host)) {
+    host = `${host}.onrender.com`;
+  }
+  return `https://${host}`;
 }
 
 export const config: ServerConfig = {

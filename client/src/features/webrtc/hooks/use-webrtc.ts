@@ -13,9 +13,18 @@ import {
 import { Socket } from 'socket.io-client';
 
 function normalizeApiUrl(url: string): string {
-  const trimmed = url.trim();
-  if (/^https?:\/\//i.test(trimmed)) return trimmed.replace(/\/$/, '');
-  return `https://${trimmed.replace(/\/$/, '')}`;
+  const trimmed = url.trim().replace(/\/$/, '');
+  if (!trimmed) return 'http://localhost:8080';
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  let host = trimmed;
+  if (!host.includes('.') && /^[a-z0-9-]+$/i.test(host)) {
+    host = `${host}.onrender.com`;
+  }
+  const isLocal = host === 'localhost:8080' || host === 'localhost' || host.includes('localhost');
+  if (isLocal && typeof window !== 'undefined' && window.location.hostname.endsWith('vercel.app')) {
+    return 'https://candid-server-hb32.onrender.com';
+  }
+  return `https://${host}`;
 }
 const _rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const API_URL = normalizeApiUrl(_rawApiUrl);

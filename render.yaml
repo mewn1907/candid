@@ -22,10 +22,7 @@ services:
       - key: LOG_LEVEL
         value: info
       - key: CORS_ORIGIN
-        fromService:
-          name: candid-client
-          type: web
-          property: host
+        value: https://candid-mewn.vercel.app,https://candid-client.onrender.com
       - key: STUN_SERVERS
         value: stun:stun.l.google.com:19302
 
