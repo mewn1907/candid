@@ -32,7 +32,6 @@ services:
   - type: web
     name: candid-client
     env: static
-    plan: free
     branch: main
     rootDir: client
     buildCommand: npm ci && npm run build
