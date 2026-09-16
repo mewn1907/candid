@@ -114,12 +114,10 @@ export function useTheme(): ThemeContextValue {
 
 export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
   const { theme, setTheme, themes } = useTheme();
-  const [open, setOpen] = useState(false);
-  const current = themes.find((t) => t.id === theme) ?? themes[0];
 
   if (compact) {
     return (
-      <div className="relative">
+      <div className="w-full">
         {/* Desktop: inline pills */}
         <div className="hidden sm:flex items-center gap-1.5 max-w-full">
           {themes.map((t) => {
@@ -142,51 +140,26 @@ export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false
             );
           })}
         </div>
-        {/* Mobile: single big pill that opens sheet — no clash with CANDID */}
-        <div className="sm:hidden">
-          <button
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={open}
-            aria-haspopup="dialog"
-            className="flex items-center gap-2 px-3 py-2 rounded-full bg-paper-200 border border-paper-border shadow-cozy-sm text-ink-700"
-          >
-            <span className="w-7 h-7 rounded-full border border-white shadow-inner flex items-center justify-center text-xs" style={{ background: current.swatch }} aria-hidden="true">
-              {current.emoji}
-            </span>
-            <span className="text-xs font-medium">{current.label}</span>
-            <svg className={`w-3 h-3 text-ink-500 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-          </button>
-          {open && (
-            <div className="absolute right-0 mt-2 w-[280px] card p-3 border-paper-border/90 bg-paper-100 shadow-cozy z-50 animate-in" role="dialog" aria-label="Pick wabi style">
-              <div className="flex items-center justify-between mb-2 px-1">
-                <span className="text-xs font-semibold text-ink-700 uppercase tracking-wider">🎨 Wabi Style</span>
-                <button onClick={() => setOpen(false)} className="text-[11px] font-mono text-ink-500 px-2 py-1 rounded-full hover:bg-paper-200">Close</button>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {themes.map((t) => {
-                  const active = t.id === theme;
-                  return (
-                    <button
-                      key={t.id}
-                      onClick={() => {
-                        setTheme(t.id);
-                        setOpen(false);
-                      }}
-                      role="radio"
-                      aria-checked={active}
-                      className={`flex flex-col items-center gap-1.5 p-2.5 rounded-organic-sm transition-all ${active ? 'bg-paper-200 ring-2 ring-clay shadow-sm' : 'hover:bg-paper-200/60'}`}
-                    >
-                      <span className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-base shadow-inner ${active ? 'border-clay' : 'border-white'}`} style={{ background: t.swatch }} aria-hidden="true">
-                        {t.emoji}
-                      </span>
-                      <span className={`text-xs font-medium ${active ? 'text-ink-900' : 'text-ink-700'}`}>{t.label}</span>
-                      <span className="text-[10px] text-ink-500 text-center leading-tight">{t.hint}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+        {/* Mobile: big tappable slider — horizontal scroll, no dropdown, no clash */}
+        <div className="sm:hidden flex gap-2 overflow-x-auto pb-1 px-1 scrollbar-none snap-x snap-mandatory">
+          {themes.map((t) => {
+            const active = t.id === theme;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setTheme(t.id)}
+                role="radio"
+                aria-checked={active}
+                aria-label={`${t.label} — ${t.hint}`}
+                className={`flex-shrink-0 snap-center flex flex-col items-center gap-1 p-2 rounded-organic-sm transition-all min-w-[68px] ${active ? 'bg-paper-200 ring-2 ring-clay scale-105 shadow-sm' : 'bg-paper-100/70 border border-paper-border/50 opacity-85'}`}
+              >
+                <span className={`w-11 h-11 rounded-full border-2 flex items-center justify-center text-base shadow-inner ${active ? 'border-clay' : 'border-white'}`} style={{ background: t.swatch }} aria-hidden="true">
+                  {t.emoji}
+                </span>
+                <span className={`text-xs font-medium leading-none ${active ? 'text-ink-900' : 'text-ink-700'}`}>{t.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
     );
