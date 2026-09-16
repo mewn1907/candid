@@ -6,9 +6,10 @@ import { useCamera } from './hooks/use-camera';
 interface CameraPreviewProps {
   onError?: (error: { code: string; message: string }) => void;
   onStreamReady?: (stream: MediaStream) => void;
+  filterStyle?: string;
 }
 
-export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamReady }) => {
+export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamReady, filterStyle }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const {
     stream,
@@ -150,7 +151,10 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamR
             <video
               ref={videoRef}
               className="w-full h-full object-cover"
-              style={{ transform: mirrored ? 'scaleX(-1)' : undefined }}
+              style={{ 
+                transform: mirrored ? 'scaleX(-1)' : undefined,
+                filter: filterStyle || undefined,
+              }}
               autoPlay
               playsInline
               muted

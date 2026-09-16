@@ -11,6 +11,7 @@ import { PhotoEditor } from '../capture/PhotoEditor';
 import { buildPolaroid } from '../capture/polaroid';
 import { playTick, playShutter } from '../capture/sounds';
 import { copyImageToClipboard, shareImage } from '../capture/share';
+import { canvasFilterFor } from '../capture/filters';
 
 export const RoomView: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -453,6 +454,7 @@ export const RoomView: React.FC = () => {
                 <CameraPreview
                   onError={setCameraError}
                   onStreamReady={handleStreamReady}
+                  filterStyle={canvasFilterFor(filter)}
                 />
 
                 <RemoteVideo
@@ -461,6 +463,9 @@ export const RoomView: React.FC = () => {
                   connectionState={connectionState}
                 />
               </div>
+              {filter !== 'natural' && (
+                <p className="text-caption text-center text-surface-500">Preview: {filter} filter will be applied at capture</p>
+              )}
 
               {captureState === 'result' && composedImage && (
                 <div className="space-y-6 animate-in">
@@ -796,6 +801,39 @@ export const RoomView: React.FC = () => {
                       </div>
                     )}
                   </div>
+                </div>
+              )}
+
+              {burstImages.length > 0 && captureState !== 'gallery' && captureState !== 'idle' && captureState !== 'result' && (
+                <div className="pt-4 text-center text-caption text-surface-500 animate-in">
+                  Burst progress: {burstImages.length}/{burstCount} shots — collage will appear after {burstCount} shots
+                </div>
+              )}
+
+              {burstImages.length > 1 && captureState === 'result' && (
+                <div className="pt-6 border-t border-surface-200 space-y-4 animate-in">
+                  <h4 className="text-heading-sm font-semibold text-surface-900 text-center">Make a collage</h4>
+                  <p className="text-body-sm text-surface-600 text-center">You have {burstImages.length} shots so far — finish burst to build collage, or create one now</p>
+                  <div className="flex items-center justify-center gap-2">
+                    {(['strip', 'grid'] as const).map((layout) => (
+                      <button
+                        key={layout}
+                        type="button"
+                        onClick={() => setCollageChoice(layout)}
+                        className={`px-4 py-2 rounded-full text-body-sm capitalize ${collageChoice === layout ? 'bg-wabi-500 text-surface-950 font-medium shadow-sm' : 'bg-surface-100 text-surface-600'}`}
+                      >
+                        {layout}
+                      </button>
+                    ))}
+                  </div>
+                  <button onClick={() => createCollage(collageChoice)} className="btn-primary btn-lg w-full max-w-lg mx-auto">
+                    Create Collage — {collageChoice === 'strip' ? 'Strip' : 'Grid'}
+                  </button>
+                  {collageImage && (
+                    <div className="relative w-full max-w-lg mx-auto rounded-xl overflow-hidden shadow border border-surface-200 bg-white">
+                      <img src={collageImage} alt="Collage preview" className="w-full h-auto" />
+                    </div>
+                  )}
                 </div>
               )}
 
