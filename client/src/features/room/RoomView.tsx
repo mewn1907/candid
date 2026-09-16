@@ -28,7 +28,8 @@ export const RoomView: React.FC = () => {
     error,
     leaveRoom,
     socket,
-  } = useRoomContext();
+    apiUrl,
+  } = useRoomContext() as any;
   const [cameraError, setCameraError] = useState<{ code: string; message: string } | null>(null);
   const [webrtcError, setWebRTCError] = useState<{ code: string; message: string } | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
@@ -72,7 +73,7 @@ export const RoomView: React.FC = () => {
 
   useEffect(() => {
     if (!roomId) return;
-    if (currentRoom?.id === roomId && currentParticipantId && currentRoom.participants.some((p) => p.id === currentParticipantId)) return;
+    if (currentRoom?.id === roomId && currentParticipantId && currentRoom.participants.some((p: any) => p.id === currentParticipantId)) return;
     joinRoom(roomId).catch(() => {
       navigate('/', { replace: true });
     });
@@ -376,6 +377,22 @@ export const RoomView: React.FC = () => {
       default:
         return state;
     }
+  };
+
+  // Debug overlay — ?debug=1 or localStorage candid_debug=1
+  const isDebug = typeof window !== 'undefined' && (new URLSearchParams(window.location.search).has('debug') || localStorage.getItem('candid_debug') === '1');
+  const debugInfo = {
+    roomId,
+    currentRoom,
+    currentParticipantId,
+    isConnected,
+    isWaiting,
+    networkStatus,
+    apiUrl,
+    socketId: socket?.id || 'none',
+    socketConnected: socket?.connected ?? false,
+    captureState,
+    error: error || cameraError?.message || webrtcError?.message || captureError?.message || null,
   };
 
   // Extract countdown display value to satisfy TypeScript type narrowing in JSX
@@ -1179,6 +1196,16 @@ export const RoomView: React.FC = () => {
           )}
         </div>
       </main>
+
+      {isDebug && (
+        <div className="max-w-4xl w-full mt-6 p-3 bg-ink-900 text-green-300 font-mono text-xs rounded-lg overflow-auto max-h-[320px] border border-ink-700">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-semibold text-cream">DEBUG (?debug=1)</span>
+            <button onClick={() => { localStorage.removeItem('candid_debug'); location.search=''; }} className="text-[10px] px-2 py-1 rounded bg-white/10 border border-white/20">Hide (?debug=0)</button>
+          </div>
+          <pre className="whitespace-pre-wrap break-all">{JSON.stringify(debugInfo, null, 2)}</pre>
+        </div>
+      )}
 
       <footer className="max-w-4xl w-full mt-8 text-center">
         <p className="text-caption text-surface-400">©️ Mewn</p>
