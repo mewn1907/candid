@@ -14,6 +14,7 @@ import { copyImageToClipboard, shareImage } from '../capture/share';
 import { canvasFilterFor, PHOTO_FILTERS } from '../capture/filters';
 import { SeasonalSelector } from '../capture/SeasonalSelector';
 import { SeasonalFrameId } from '../capture/seasonal';
+import { PromptCard, DoodleOverlay, StickerOverlay } from '../capture/CreativeExtras';
 
 export const RoomView: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -193,6 +194,34 @@ export const RoomView: React.FC = () => {
   const [polaroidBurst, setPolaroidBurst] = useState<string | null>(null);
   const [polaroidCaption, setPolaroidCaption] = useState('Candid · wabi-sabi');
   const [seasonalFrame, setSeasonalFrame] = useState<SeasonalFrameId>('none');
+  // Creative extras (all optional, off by default)
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [promptEnabled, setPromptEnabled] = useState(false);
+  const [bgBlur, setBgBlur] = useState(false);
+  const [doubleExposure, setDoubleExposure] = useState(false);
+  const [washiColor, setWashiColor] = useState('#E5BF94');
+  const [boomerang, setBoomerang] = useState(false);
+  const [clipUrl, setClipUrl] = useState<string | null>(null);
+  const [doodleTarget, setDoodleTarget] = useState<string | null>(null);
+  const [stickerTarget, setStickerTarget] = useState<string | null>(null);
+
+  const doStartCapture = () => {
+    if (boomerang && localStream) {
+      try {
+        const rec = new MediaRecorder(localStream, { mimeType: 'video/webm' });
+        const chunks: Blob[] = [];
+        rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+        rec.onstop = () => { const blob = new Blob(chunks, { type: 'video/webm' }); setClipUrl(URL.createObjectURL(blob)); };
+        rec.start(); setTimeout(()=>{ if (rec.state==='recording') rec.stop(); }, 3000);
+      } catch {}
+    }
+    startCapture();
+  };
+  const handleStartCapture = () => {
+    if (promptEnabled && !showPrompt) { setShowPrompt(true); return; }
+    setShowPrompt(false);
+    doStartCapture();
+  };
 
   // Extra feature 5: share polish
   const [shareNote, setShareNote] = useState<string | null>(null);
@@ -439,6 +468,8 @@ export const RoomView: React.FC = () => {
                   </span>
                 </div>
 
+                {showPrompt && <PromptCard onDismiss={() => { setShowPrompt(false); doStartCapture(); }} />}
+
                 {captureState !== 'idle' && captureState !== 'gallery' && (
                   <div className="mt-4 p-4 bg-wabi-50 border border-wabi-200 rounded-xl animate-in">
                     <div className="flex flex-col items-center gap-2">
@@ -460,6 +491,7 @@ export const RoomView: React.FC = () => {
                   onStreamReady={handleStreamReady}
                   filterStyle={canvasFilterFor(filter)}
                   filterId={filter}
+                  bgBlur={bgBlur}
                 />
 
                 <RemoteVideo
@@ -468,6 +500,14 @@ export const RoomView: React.FC = () => {
                   connectionState={connectionState}
                 />
               </div>
+              {bgBlur && <p className="text-[11px] text-ink-500 text-center">Cozy blur bg enabled (extra)</p>}
+              {clipUrl && (
+                <div className="max-w-md mx-auto p-3 bg-paper-50 border border-paper-border rounded-organic text-center">
+                  <p className="text-xs font-mono text-ink-700 mb-2">Boomerang clip (3s, extra)</p>
+                  <video src={clipUrl} autoPlay loop muted playsInline className="w-full rounded-organic-sm" />
+                  <a href={clipUrl} download={`candid-clip-${Date.now()}.webm`} className="btn-ghost btn-sm mt-2">Download clip</a>
+                </div>
+              )}
               {filter !== 'natural' && (
                 <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-full bg-clay-subtle border border-clay/20 w-fit mx-auto animate-in">
                   <span className="w-3 h-3 rounded-full border border-white shadow-sm" style={{ background: PHOTO_FILTERS.find(f=>f.id===filter)?.swatch as any || '#c7b48f' }} />
@@ -538,9 +578,19 @@ export const RoomView: React.FC = () => {
                       Copy image
                     </button>
                   </div>
+                  <div className="flex flex-wrap gap-2 justify-center pt-3 border-t border-paper-border/50">
+                    <button onClick={()=>setDoodleTarget(displaySingle!)} className="btn-ghost btn-sm border border-paper-border text-xs">✏️ Doodle (extra)</button>
+                    <button onClick={()=>setStickerTarget(displaySingle!)} className="btn-ghost btn-sm border border-paper-border text-xs">⭐ Stickers (extra)</button>
+                    <button onClick={async ()=>{
+                      // double-exposure blend: overlay displaySingle with 50% opacity mirrored
+                      const img = new Image(); img.src = displaySingle!; await new Promise(r=>img.onload=r);
+                      const c=document.createElement('canvas'); c.width=img.width; c.height=img.height; const ctx=c.getContext('2d')!; ctx.drawImage(img,0,0); ctx.globalAlpha=0.45; ctx.save(); ctx.scale(-1,1); ctx.drawImage(img, -c.width,0,c.width,c.height); ctx.restore(); const url=c.toDataURL('image/jpeg',0.92); setEditedSingle(url); flashNote('Double exposure applied (extra)');
+                    }} className="btn-ghost btn-sm border border-paper-border text-xs">Double exposure (extra)</button>
+                    <span className="flex items-center gap-1 text-xs text-ink-500">Washi<span style={{background:washiColor} as any} className="w-4 h-4 rounded-full border border-paper-border inline-block" /></span>
+                  </div>
                   {shareNote && <p className="text-caption text-center text-surface-500">{shareNote}</p>}
                   <div className="pt-4 border-t border-surface-200 space-y-3">
-                    <p className="text-body-sm font-medium text-surface-700 text-center">Polaroid — wabi strip</p>
+                    <p className="text-body-sm font-medium text-surface-700 text-center">Polaroid — wabi strip {seasonalFrame!=='none' ? `· ${seasonalFrame}`:''} <span className="text-xs text-ink-500">(extra: {washiColor})</span></p>
                     <input
                       value={polaroidCaption}
                       onChange={(e) => setPolaroidCaption(e.target.value)}
@@ -897,6 +947,22 @@ export const RoomView: React.FC = () => {
                 <div className="pt-4 animate-in space-y-6">
                   <FilterSelector selected={filter} onSelect={setFilter} />
                   <SeasonalSelector selected={seasonalFrame} onSelect={setSeasonalFrame} />
+                  <div className="card p-4 border-paper-border/80 bg-paper-50/70">
+                    <p className="text-xs font-semibold text-ink-700 uppercase tracking-wider mb-3 text-center">Creative extras (optional)</p>
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <label className="flex items-center gap-2 p-2 rounded-organic-sm bg-white border border-paper-border cursor-pointer"><input type="checkbox" checked={promptEnabled} onChange={e=>setPromptEnabled(e.target.checked)} className="accent-clay" /> Prompt card</label>
+                      <label className="flex items-center gap-2 p-2 rounded-organic-sm bg-white border border-paper-border cursor-pointer"><input type="checkbox" checked={bgBlur} onChange={e=>setBgBlur(e.target.checked)} className="accent-clay" /> Cozy blur bg</label>
+                      <label className="flex items-center gap-2 p-2 rounded-organic-sm bg-white border border-paper-border cursor-pointer"><input type="checkbox" checked={doubleExposure} onChange={e=>setDoubleExposure(e.target.checked)} className="accent-clay" /> Double exposure</label>
+                      <label className="flex items-center gap-2 p-2 rounded-organic-sm bg-white border border-paper-border cursor-pointer"><input type="checkbox" checked={boomerang} onChange={e=>setBoomerang(e.target.checked)} className="accent-clay" /> Boomerang clip</label>
+                    </div>
+                    <div className="mt-3 flex items-center gap-2">
+                      <span className="text-[11px] text-ink-500">Washi tape</span>
+                      {['#E5BF94','#3E4D3A','#BD5338','#4A6B82','#F5EFEB'].map(c=>(
+                        <button key={c} onClick={()=>setWashiColor(c)} className={`w-6 h-6 rounded-full border ${washiColor===c?'ring-2 ring-clay':''}`} style={{background:c}} aria-label={c} />
+                      ))}
+                    </div>
+                    <p className="text-[11px] text-ink-500 text-center mt-2">All extras are opt-in — enable only what you want</p>
+                  </div>
                   <div className="animate-in">
                     <p className="text-body-sm font-medium text-surface-700 mb-3 text-center">Shots</p>
                     <div className="flex items-center justify-center gap-2" role="radiogroup" aria-label="Number of shots">
@@ -949,7 +1015,7 @@ export const RoomView: React.FC = () => {
                     </div>
                   </div>
                   <button
-                    onClick={startCapture}
+                    onClick={handleStartCapture}
                     disabled={!localStream}
                     className="btn-primary btn-lg w-full"
                     aria-disabled={!localStream}
@@ -958,8 +1024,9 @@ export const RoomView: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <span>Start Capture</span>
+                    <span>Start Capture {promptEnabled ? '(extra: prompt)' : ''}</span>
                   </button>
+                  {promptEnabled && <p className="text-[11px] text-ink-500 text-center">Prompt card will show before countdown (extra)</p>}
                 </div>
               )}
 
@@ -998,6 +1065,8 @@ export const RoomView: React.FC = () => {
           }}
         />
       )}
+      {doodleTarget && <DoodleOverlay src={doodleTarget} onClose={()=>setDoodleTarget(null)} onSave={(url)=>{ setEditedSingle(url); setDoodleTarget(null); }} />}
+      {stickerTarget && <StickerOverlay src={stickerTarget} onClose={()=>setStickerTarget(null)} onSave={(url)=>{ setEditedSingle(url); setStickerTarget(null); }} />}
     </div>
   );
 };

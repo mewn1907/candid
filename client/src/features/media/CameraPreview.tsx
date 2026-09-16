@@ -8,9 +8,10 @@ interface CameraPreviewProps {
   onStreamReady?: (stream: MediaStream) => void;
   filterStyle?: string;
   filterId?: string;
+  bgBlur?: boolean;
 }
 
-export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamReady, filterStyle, filterId }) => {
+export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamReady, filterStyle, filterId, bgBlur }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const {
     stream,
@@ -154,7 +155,7 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamR
               className="w-full h-full object-cover"
               style={{ 
                 transform: mirrored ? 'scaleX(-1)' : undefined,
-                filter: filterStyle || undefined,
+                filter: [filterStyle, bgBlur ? 'blur(6px)' : ''].filter(Boolean).join(' ') || undefined,
               }}
               autoPlay
               playsInline
