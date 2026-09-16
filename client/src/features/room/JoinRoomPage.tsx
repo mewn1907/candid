@@ -8,7 +8,7 @@ export const JoinRoomPage: React.FC = () => {
   const navigate = useNavigate();
   const { roomId: linkRoomId } = useParams<{ roomId?: string }>();
   const { joinRoom, loading, error } = useRoomContext();
-  const [roomId, setRoomId] = useState(linkRoomId?.toUpperCase() ?? '');
+  const [roomId, setRoomId] = useState(linkRoomId ?? '');
 
   const join = async (id: string) => {
     if (!id.trim()) return;
@@ -77,13 +77,16 @@ export const JoinRoomPage: React.FC = () => {
               id="roomId"
               type="text"
               value={roomId}
-              onChange={(e) => setRoomId(e.target.value.toUpperCase())}
+              onChange={(e) => setRoomId(e.target.value)}
               placeholder="Enter room ID"
-              className="input text-center text-heading-sm tracking-widest uppercase"
+              className="input text-center text-heading-sm tracking-widest"
               maxLength={20}
               autoFocus
               required
               autoComplete="off"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
             />
           </div>
 

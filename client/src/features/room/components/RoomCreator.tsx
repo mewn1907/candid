@@ -127,11 +127,14 @@ export const RoomJoiner: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
             id="roomId"
             type="text"
             value={roomId}
-            onChange={(e) => setRoomId(e.target.value.toUpperCase())}
+            onChange={(e) => setRoomId(e.target.value)}
             placeholder="Enter room ID"
-            className="input text-center text-heading-sm tracking-widest uppercase"
+            className="input text-center text-heading-sm tracking-widest"
             maxLength={20}
             autoComplete="off"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
             required
           />
         </div>
