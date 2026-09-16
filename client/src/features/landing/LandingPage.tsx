@@ -1,6 +1,7 @@
 // ©️ Mewn — Cozy Wabi-Sabi (Stitch)
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { ThemeSwitcher } from '../theme';
 
 export const LandingPage: React.FC = () => {
   return (
@@ -94,6 +95,10 @@ export const LandingPage: React.FC = () => {
             <h2 className="font-semibold text-ink-900 text-base mb-1">Cozy Vintage Filters</h2>
             <p className="text-sm text-ink-700 leading-relaxed">Warm Kodachrome, Fuji Velvia tones, and textured grain. Export as polaroids or twin photobooth strips.</p>
           </div>
+        </div>
+
+        <div className="w-full max-w-2xl mt-10">
+          <ThemeSwitcher />
         </div>
       </main>
       <footer className="relative z-10 w-full border-t border-paper-border py-6 px-6 bg-paper-50/60 backdrop-blur-sm">

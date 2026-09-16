@@ -15,6 +15,7 @@ import { canvasFilterFor, PHOTO_FILTERS } from '../capture/filters';
 import { SeasonalSelector } from '../capture/SeasonalSelector';
 import { SeasonalFrameId } from '../capture/seasonal';
 import { PromptCard, DoodleOverlay, StickerOverlay } from '../capture/CreativeExtras';
+import { ThemeSwitcher } from '../theme';
 
 export const RoomView: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -459,6 +460,9 @@ export const RoomView: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <div className="hidden lg:flex">
+              <ThemeSwitcher compact />
+            </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-caption font-medium bg-surface-100 text-surface-700">
               <span className={`w-2 h-2 rounded-full ${
                 networkStatus === 'connected' ? 'bg-pine-600' :
@@ -1066,6 +1070,7 @@ export const RoomView: React.FC = () => {
                 <div className="pt-4 animate-in space-y-6">
                   <FilterSelector selected={filter} onSelect={setFilter} />
                   <SeasonalSelector selected={seasonalFrame} onSelect={setSeasonalFrame} />
+                  <ThemeSwitcher />
                   <div className="card p-4 border-paper-border/80 bg-paper-50/70">
                     <p className="text-xs font-semibold text-ink-700 uppercase tracking-wider mb-3 text-center">Creative extras (optional)</p>
                     <div className="grid grid-cols-2 gap-3 text-xs">

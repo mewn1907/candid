@@ -4,7 +4,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        // New cozy paper system (Stitch)
+        // Base cozy paper system — overridden at runtime via [data-theme] CSS (see index.css)
+        // Keep hex here so Tailwind opacity modifiers (/70) work; theme switching uses attribute overrides.
         paper: {
           50: '#FDFBF7',
           100: '#FDF8F0',
@@ -126,9 +127,9 @@ export default {
         caption: ['0.75rem', { lineHeight: '1.5', letterSpacing: '0.01em' }],
       },
       borderRadius: {
-        'organic-sm': '14px 12px 16px 13px',
-        organic: '24px 20px 26px 22px',
-        'organic-lg': '32px 28px 34px 26px',
+        'organic-sm': 'var(--radius-organic-sm, 14px 12px 16px 13px)',
+        organic: 'var(--radius-organic, 24px 20px 26px 22px)',
+        'organic-lg': 'var(--radius-organic-lg, 32px 28px 34px 26px)',
         deckle: '6px 4px 5px 7px',
         'radius-sm': '0.375rem',
         'radius-md': '0.5rem',
