@@ -49,7 +49,6 @@ export const LandingPage: React.FC = () => {
                   <div className="w-12 h-12 rounded-full bg-cream mx-auto flex items-center justify-center shadow-sm text-clay font-mono text-sm">YOU</div>
                 </div>
               </div>
-              <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/40 text-white font-mono text-[10px] backdrop-blur-sm">PARIS • 11:42 PM</div>
             </div>
             <p className="font-handwritten text-lg text-ink-700 text-center mt-3">"Wish you were sitting right here"</p>
           </div>
@@ -61,7 +60,6 @@ export const LandingPage: React.FC = () => {
                   <div className="w-12 h-12 rounded-full bg-cream mx-auto flex items-center justify-center shadow-sm text-pine font-mono text-sm">THEM</div>
                 </div>
               </div>
-              <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/40 text-white font-mono text-[10px] backdrop-blur-sm">TOKYO • 06:42 AM</div>
             </div>
             <p className="font-handwritten text-lg text-ink-700 text-center mt-3">"Frames together forever."</p>
           </div>
