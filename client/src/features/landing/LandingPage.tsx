@@ -46,8 +46,7 @@ export const LandingPage: React.FC = () => {
             <div className="aspect-[4/3] bg-paper-300 rounded overflow-hidden relative shadow-inner">
               <div className="w-full h-full bg-gradient-to-tr from-clay/30 via-paper-200 to-cream flex items-center justify-center">
                 <div className="text-center p-3">
-                  <div className="w-12 h-12 rounded-full bg-cream mx-auto mb-2 flex items-center justify-center shadow-sm text-clay font-mono text-sm">YOU</div>
-                  <p className="text-xs text-ink-700 font-mono">Room Creator</p>
+                  <div className="w-12 h-12 rounded-full bg-cream mx-auto flex items-center justify-center shadow-sm text-clay font-mono text-sm">YOU</div>
                 </div>
               </div>
               <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/40 text-white font-mono text-[10px] backdrop-blur-sm">PARIS • 11:42 PM</div>
@@ -59,8 +58,7 @@ export const LandingPage: React.FC = () => {
             <div className="aspect-[4/3] bg-paper-300 rounded overflow-hidden relative shadow-inner">
               <div className="w-full h-full bg-gradient-to-tl from-pine/25 via-paper-200 to-cream flex items-center justify-center">
                 <div className="text-center p-3">
-                  <div className="w-12 h-12 rounded-full bg-cream mx-auto mb-2 flex items-center justify-center shadow-sm text-pine font-mono text-sm">THEM</div>
-                  <p className="text-xs text-ink-700 font-mono">Connected Peer</p>
+                  <div className="w-12 h-12 rounded-full bg-cream mx-auto flex items-center justify-center shadow-sm text-pine font-mono text-sm">THEM</div>
                 </div>
               </div>
               <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/40 text-white font-mono text-[10px] backdrop-blur-sm">TOKYO • 06:42 AM</div>
