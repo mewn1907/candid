@@ -13,8 +13,8 @@ interface Star {
   color: string;
 }
 
-const STAR_COUNT = 110;
-const SHOOTING_INTERVAL_MS = 4200;
+const STAR_COUNT = 140;
+const SHOOTING_INTERVAL_MS = 3800;
 
 export const StarsBackground: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,12 +40,12 @@ export const StarsBackground: React.FC = () => {
 
     const getThemeStarColors = (): string[] => {
       const theme = document.documentElement.getAttribute('data-theme') || 'sabi';
-      // theme-aware palette — keep subtle on light, gold on kintsugi
-      if (theme === 'kintsugi') return ['rgba(212,175,55,', 'rgba(240,216,120,', 'rgba(255,255,255,'];
-      if (theme === 'minimal') return ['rgba(0,0,0,', 'rgba(64,64,64,'];
-      if (theme === 'ink') return ['rgba(43,43,43,', 'rgba(115,111,104,'];
-      if (theme === 'nordic') return ['rgba(154,175,136,', 'rgba(255,255,255,'];
-      return ['rgba(196,136,73,', 'rgba(255,255,255,', 'rgba(90,104,80,']; // sabi
+      // high-contrast palette per theme so stars actually show on bg-paper-100
+      if (theme === 'kintsugi') return ['rgba(212,175,55,', 'rgba(240,216,120,', 'rgba(255,255,255,']; // gold on ink
+      if (theme === 'minimal') return ['rgba(17,17,17,', 'rgba(64,64,64,', 'rgba(115,115,115,'];
+      if (theme === 'ink') return ['rgba(26,26,26,', 'rgba(64,64,64,', 'rgba(115,111,104,'];
+      if (theme === 'nordic') return ['rgba(90,109,90,', 'rgba(154,175,136,', 'rgba(90,90,90,'];
+      return ['rgba(196,136,73,', 'rgba(61,77,58,', 'rgba(42,36,22,']; // sabi — dark-visible on light paper
     };
 
     const resize = () => {
@@ -63,12 +63,12 @@ export const StarsBackground: React.FC = () => {
       starsRef.current = Array.from({ length: STAR_COUNT }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
-        r: Math.random() * 1.1 + 0.3,
-        baseAlpha: Math.random() * 0.5 + 0.15,
+        r: Math.random() * 1.2 + 0.7,
+        baseAlpha: Math.random() * 0.45 + 0.45,
         twinkleSpeed: Math.random() * 0.003 + 0.0012,
         twinklePhase: Math.random() * Math.PI * 2,
-        driftX: (Math.random() - 0.5) * 0.18,
-        driftY: (Math.random() - 0.5) * 0.18,
+        driftX: (Math.random() - 0.5) * 0.22,
+        driftY: (Math.random() - 0.5) * 0.22,
         color: colors[Math.floor(Math.random() * colors.length)],
       }));
     };
@@ -130,17 +130,20 @@ export const StarsBackground: React.FC = () => {
         const tw = Math.sin(now * s.twinkleSpeed + s.twinklePhase) * 0.35 + 0.65;
         const alpha = s.baseAlpha * tw;
 
-        // core star
+        // core star with soft glow
+        ctx.shadowBlur = s.r > 1.2 ? 6 : 0;
+        ctx.shadowColor = `${s.color}${alpha * 0.5})`;
         ctx.fillStyle = `${s.color}${alpha})`;
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
         ctx.fill();
+        ctx.shadowBlur = 0;
 
-        // subtle halo for larger stars
-        if (s.r > 0.9) {
-          ctx.fillStyle = `${s.color}${alpha * 0.18})`;
+        // halo for larger stars
+        if (s.r > 1.1) {
+          ctx.fillStyle = `${s.color}${alpha * 0.22})`;
           ctx.beginPath();
-          ctx.arc(s.x, s.y, s.r * 2.2, 0, Math.PI * 2);
+          ctx.arc(s.x, s.y, s.r * 2.4, 0, Math.PI * 2);
           ctx.fill();
         }
       });
@@ -207,8 +210,8 @@ export const StarsBackground: React.FC = () => {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ opacity: 0.9 }}
+      className="absolute inset-0 w-full h-full pointer-events-none z-[1]"
+      style={{ opacity: 1 }}
     />
   );
 };
