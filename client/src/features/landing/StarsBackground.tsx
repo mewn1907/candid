@@ -63,12 +63,12 @@ export const StarsBackground: React.FC = () => {
       starsRef.current = Array.from({ length: STAR_COUNT }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
-        r: Math.random() * 1.4 + 1.1,
-        baseAlpha: Math.random() * 0.3 + 0.7,
-        twinkleSpeed: Math.random() * 0.0025 + 0.001,
+        r: Math.random() * 1.6 + 1.0,
+        baseAlpha: Math.random() * 0.25 + 0.75,
+        twinkleSpeed: Math.random() * 0.004 + 0.0015,
         twinklePhase: Math.random() * Math.PI * 2,
-        driftX: (Math.random() - 0.5) * 0.45,
-        driftY: (Math.random() - 0.5) * 0.45,
+        driftX: (Math.random() - 0.5) * 0.5,
+        driftY: (Math.random() - 0.5) * 0.5,
         color: colors[Math.floor(Math.random() * colors.length)],
       }));
     };
@@ -127,28 +127,58 @@ export const StarsBackground: React.FC = () => {
           if (s.y < -5) s.y = rectH + 5;
           if (s.y > rectH + 5) s.y = -5;
         }
-        const tw = Math.sin(now * s.twinkleSpeed + s.twinklePhase) * 0.3 + 0.7;
+        const tw = Math.sin(now * s.twinkleSpeed + s.twinklePhase) * 0.45 + 0.55;
         const alpha = Math.min(1, s.baseAlpha * tw);
+        const isShining = s.r > 1.6 || Math.sin(now * 0.001 + s.twinklePhase) > 0.92; // ~8% of stars shine extra
+        const glowColor = isShining ? 'rgba(212,175,55,' : s.color;
+        const sparkleColor = isShining ? 'rgba(255,230,120,' : s.color;
 
-        // core star — solid + glow so it pops on paper
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = `${s.color}${alpha * 0.55})`;
+        // outer glow — soft shining halo (gold for shine)
+        ctx.shadowBlur = isShining ? 16 : 10;
+        ctx.shadowColor = `${glowColor}${alpha * 0.85})`;
         ctx.fillStyle = `${s.color}${alpha})`;
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
         ctx.fill();
         ctx.shadowBlur = 0;
 
-        // halo
-        ctx.fillStyle = `${s.color}${alpha * 0.28})`;
+        // inner halo — gold-tinted for shine
+        ctx.fillStyle = `${glowColor}${alpha * 0.38})`;
         ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r * 2.6, 0, Math.PI * 2);
+        ctx.arc(s.x, s.y, s.r * 2.8, 0, Math.PI * 2);
         ctx.fill();
+
+        // 4-point sparkle for shining stars — bright gold cross
+        if (isShining && alpha > 0.72) {
+          const spike = s.r * 3.6;
+          const a = alpha * 0.95;
+          ctx.strokeStyle = `${sparkleColor}${a})`;
+          ctx.lineWidth = 1.1;
+          ctx.lineCap = 'round';
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = `${sparkleColor}${a * 0.6})`;
+          ctx.beginPath();
+          ctx.moveTo(s.x - spike, s.y);
+          ctx.lineTo(s.x + spike, s.y);
+          ctx.moveTo(s.x, s.y - spike);
+          ctx.lineTo(s.x, s.y + spike);
+          ctx.stroke();
+          // diagonal sparkle
+          ctx.globalAlpha = a * 0.55;
+          ctx.beginPath();
+          ctx.moveTo(s.x - spike * 0.7, s.y - spike * 0.7);
+          ctx.lineTo(s.x + spike * 0.7, s.y + spike * 0.7);
+          ctx.moveTo(s.x + spike * 0.7, s.y - spike * 0.7);
+          ctx.lineTo(s.x - spike * 0.7, s.y + spike * 0.7);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+          ctx.shadowBlur = 0;
+        }
       });
 
-      // shooting star
+      // shooting star — extra shining
       if (!prefersReduced) {
-        if (now - lastShooting > SHOOTING_INTERVAL_MS && Math.random() < 0.015) {
+        if (now - lastShooting > SHOOTING_INTERVAL_MS && Math.random() < 0.018) {
           triggerShooting();
           lastShooting = now;
         }
@@ -156,27 +186,38 @@ export const StarsBackground: React.FC = () => {
         if (sh.active) {
           sh.x += sh.vx;
           sh.y += sh.vy;
-          sh.life -= 0.018;
-          if (sh.life <= 0 || sh.x > rectW + 100 || sh.y > rectH + 100) {
+          sh.life -= 0.016;
+          if (sh.life <= 0 || sh.x > rectW + 120 || sh.y > rectH + 120) {
             sh.active = false;
           } else {
-            // trail
-            const trailLen = 70;
-            const grad2 = ctx.createLinearGradient(sh.x - sh.vx * 8, sh.y - sh.vy * 8, sh.x, sh.y);
+            // bright gold trail with glow
+            const trailLen = 90;
+            const grad2 = ctx.createLinearGradient(sh.x - sh.vx * 9, sh.y - sh.vy * 9, sh.x, sh.y);
             grad2.addColorStop(0, 'rgba(255,255,255,0)');
-            grad2.addColorStop(0.5, `rgba(212,175,55,${0.35 * sh.life})`);
-            grad2.addColorStop(1, `rgba(255,255,255,${0.9 * sh.life})`);
+            grad2.addColorStop(0.45, `rgba(212,175,55,${0.55 * sh.life})`);
+            grad2.addColorStop(1, `rgba(255,255,255,${0.98 * sh.life})`);
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = `rgba(212,175,55,${0.6 * sh.life})`;
             ctx.strokeStyle = grad2;
-            ctx.lineWidth = 1.6;
+            ctx.lineWidth = 2.2;
             ctx.lineCap = 'round';
             ctx.beginPath();
             ctx.moveTo(sh.x - sh.vx * (trailLen / 10), sh.y - sh.vy * (trailLen / 10));
             ctx.lineTo(sh.x, sh.y);
             ctx.stroke();
+            ctx.shadowBlur = 0;
 
-            ctx.fillStyle = `rgba(255,255,255,${0.95 * sh.life})`;
+            // head — white hot with gold halo
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = `rgba(255,230,120,${0.9 * sh.life})`;
+            ctx.fillStyle = `rgba(255,255,255,${0.98 * sh.life})`;
             ctx.beginPath();
-            ctx.arc(sh.x, sh.y, 1.7, 0, Math.PI * 2);
+            ctx.arc(sh.x, sh.y, 2.4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = `rgba(212,175,55,${0.7 * sh.life})`;
+            ctx.beginPath();
+            ctx.arc(sh.x, sh.y, 4.5, 0, Math.PI * 2);
             ctx.fill();
           }
         }
