@@ -452,15 +452,18 @@ export const RoomView: React.FC = () => {
         <div className="fixed inset-0 bg-white z-50 pointer-events-none" style={{ animation: 'fadeIn 60ms ease-out' }} aria-hidden="true" />
       )}
       <header className="max-w-4xl w-full mb-6">
-        <div className="flex items-center justify-between gap-4">
-          <div className="text-center flex-1">
-            <h1 className="text-display-sm font-light text-surface-900 tracking-tight">Room: <span className="text-wabi-700">{currentRoom?.id}</span></h1>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-center flex-1 w-full sm:w-auto">
+            <h1 className="text-display-sm font-light text-surface-900 tracking-tight break-all">Room: <span className="text-wabi-700">{currentRoom?.id}</span></h1>
             <p className="mt-1 text-body-md text-surface-600">
               Your participant ID: <span className="font-mono font-semibold text-wabi-700">{currentParticipantId}</span>
             </p>
+            <div className="flex sm:hidden justify-center mt-3">
+              <ThemeSwitcher compact />
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="hidden lg:flex">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-center sm:justify-end">
+            <div className="hidden sm:flex">
               <ThemeSwitcher compact />
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-caption font-medium bg-surface-100 text-surface-700">

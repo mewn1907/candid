@@ -115,7 +115,7 @@ export function useTheme(): ThemeContextValue {
 export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
   const { theme, setTheme, themes } = useTheme();
   return (
-    <div className={compact ? 'flex items-center gap-1.5' : 'card p-3 sm:p-4 border-paper-border/90 bg-paper-100/95 shadow-cozy animate-in'}>
+    <div className={compact ? 'flex items-center gap-1 sm:gap-1.5 max-w-full' : 'card p-3 sm:p-4 border-paper-border/90 bg-paper-100/95 shadow-cozy animate-in'}>
       {!compact && (
         <div className="flex items-center justify-between mb-3 px-1">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-ink-700 uppercase tracking-wider">
@@ -125,7 +125,7 @@ export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false
           <span className="text-[11px] font-mono text-ink-500">Live switch</span>
         </div>
       )}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none" role="radiogroup" aria-label="Wabi style">
+      <div className={`flex items-center gap-1 sm:gap-2 overflow-x-auto pb-1 scrollbar-none ${compact ? 'snap-x snap-mandatory' : ''}`} role="radiogroup" aria-label="Wabi style">
         {themes.map((t) => {
           const active = t.id === theme;
           return (
@@ -136,13 +136,13 @@ export const ThemeSwitcher: React.FC<{ compact?: boolean }> = ({ compact = false
               aria-checked={active}
               aria-label={`${t.label} — ${t.hint}`}
               title={`${t.label} — ${t.hint}`}
-              className={`flex-shrink-0 flex flex-col items-center gap-1 p-2 rounded-organic-sm transition-all ${active ? 'bg-paper-200 ring-2 ring-clay scale-105 shadow-sm' : 'hover:bg-paper-200/50 opacity-80 hover:opacity-100'}`}
+              className={`flex-shrink-0 snap-center flex flex-col items-center gap-0.5 sm:gap-1 p-1.5 sm:p-2 rounded-organic-sm transition-all min-w-[52px] sm:min-w-[60px] ${active ? 'bg-paper-200 ring-2 ring-clay scale-105 shadow-sm' : 'hover:bg-paper-200/50 opacity-80 hover:opacity-100'}`}
             >
-              <span className={`w-9 h-9 rounded-full border-2 flex items-center justify-center text-sm shadow-inner ${active ? 'border-clay' : 'border-white'}`} style={{ background: t.swatch }} aria-hidden="true">
+              <span className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full border-2 flex items-center justify-center text-xs sm:text-sm shadow-inner ${active ? 'border-clay' : 'border-white'}`} style={{ background: t.swatch }} aria-hidden="true">
                 <span className={active ? '' : 'opacity-80'}>{t.emoji}</span>
               </span>
-              <span className={`text-[11px] font-medium ${active ? 'text-ink-900' : 'text-ink-700'}`}>{t.label}</span>
-              {!compact && <span className="text-[9px] text-ink-500 leading-none">{t.hint}</span>}
+              <span className={`text-[10px] sm:text-[11px] font-medium leading-none ${active ? 'text-ink-900' : 'text-ink-700'}`}>{t.label}</span>
+              {!compact && <span className="text-[9px] text-ink-500 leading-none hidden sm:inline">{t.hint}</span>}
             </button>
           );
         })}
