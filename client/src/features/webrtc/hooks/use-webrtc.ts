@@ -12,7 +12,13 @@ import {
 } from '../../../types/room.types';
 import { Socket } from 'socket.io-client';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+function normalizeApiUrl(url: string): string {
+  const trimmed = url.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed.replace(/\/$/, '');
+  return `https://${trimmed.replace(/\/$/, '')}`;
+}
+const _rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_URL = normalizeApiUrl(_rawApiUrl);
 
 const FALLBACK_ICE_SERVERS: RTCIceServer[] = [
   { urls: 'stun:stun.l.google.com:19302' },

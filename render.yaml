@@ -1,9 +1,7 @@
 # Blueprint for Render — 2 services: signaling server (Node) + static frontend (Vite)
-# Docs: https://render.com/docs/blueprint-spec
-# After first deploy you MUST set the two sync:false vars in the Render Dashboard:
-#   candid-server -> CORS_ORIGIN = https://<candid-client>.onrender.com
-#   candid-client -> VITE_API_URL = https://<candid-server>.onrender.com
-# Then trigger a Manual Deploy of the client (VITE_* is baked at build time).
+# Auto-wired via fromService: no manual CORS_ORIGIN / VITE_API_URL needed.
+# Server normalizes bare hosts to https:// (server/src/config/env.ts)
+# Client normalizes VITE_API_URL (room-context + webrtc hooks)
 
 services:
   - type: web
@@ -16,7 +14,6 @@ services:
     buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /health
-    autoDeploy: false
     envVars:
       - key: NODE_ENV
         value: production
@@ -25,7 +22,10 @@ services:
       - key: LOG_LEVEL
         value: info
       - key: CORS_ORIGIN
-        sync: false
+        fromService:
+          name: candid-client
+          type: web
+          property: host
       - key: STUN_SERVERS
         value: stun:stun.l.google.com:19302
 
@@ -36,11 +36,13 @@ services:
     rootDir: client
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
-    autoDeploy: false
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        sync: false
+        fromService:
+          name: candid-server
+          type: web
+          property: host

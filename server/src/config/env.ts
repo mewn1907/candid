@@ -38,6 +38,13 @@ function getEnvNumber(key: string, defaultValue: number): number {
   return parsed;
 }
 
+function normalizeOrigin(origin: string): string {
+  const trimmed = origin.trim();
+  if (trimmed.length === 0) return trimmed;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
 export const config: ServerConfig = {
   nodeEnv: getEnv('NODE_ENV', 'development'),
   port: getEnvNumber('PORT', 8080),
@@ -45,7 +52,8 @@ export const config: ServerConfig = {
   corsOrigins: getEnv('CORS_ORIGIN', 'http://localhost:3000')
     .split(',')
     .map((s) => s.trim())
-    .filter((s) => s.length > 0),
+    .filter((s) => s.length > 0)
+    .map(normalizeOrigin),
   logLevel: getEnv('LOG_LEVEL', 'debug'),
   roomLimitPerIp: getEnvNumber('ROOM_LIMIT_PER_IP', 10),
   roomExpirySeconds: getEnvNumber('ROOM_EXPIRY_SECONDS', 3600),
