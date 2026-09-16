@@ -192,9 +192,36 @@ export const RoomView: React.FC = () => {
 
   // Extra feature 5: share polish
   const [shareNote, setShareNote] = useState<string | null>(null);
+  const [roomIdCopied, setRoomIdCopied] = useState(false);
   const flashNote = (msg: string) => {
     setShareNote(msg);
     setTimeout(() => setShareNote(null), 2200);
+  };
+
+  const copyText = async (text: string): Promise<boolean> => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+      throw new Error('clipboard unavailable');
+    } catch {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, ta.value.length);
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch {
+        return false;
+      }
+    }
   };
 
   const getCaptureStateLabel = (state: string) => {
@@ -329,27 +356,47 @@ export const RoomView: React.FC = () => {
               <div className="bg-surface-100 rounded-xl p-6 max-w-md mx-auto">
                 <div className="flex items-center justify-between mb-3">
                   <label className="text-body-sm font-medium text-surface-700">Room ID</label>
-                  <button
-                    onClick={async () => {
-                      try {
-                        await navigator.clipboard.writeText(currentRoom?.id ?? '');
-                      } catch {
-                        const textArea = document.createElement('textarea');
-                        textArea.value = currentRoom?.id ?? '';
-                        document.body.appendChild(textArea);
-                        textArea.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(textArea);
-                      }
-                    }}
-                    className="btn-ghost btn-sm text-wabi-700 hover:text-wabi-800"
-                  >
-                    Copy
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={async () => {
+                        const ok = await copyText(currentRoom?.id ?? '');
+                        if (ok) {
+                          setRoomIdCopied(true);
+                          setTimeout(() => setRoomIdCopied(false), 2000);
+                        } else {
+                          flashNote('Copy failed — select and copy manually');
+                        }
+                      }}
+                      className="btn-ghost btn-sm text-wabi-700 hover:text-wabi-800"
+                      aria-live="polite"
+                    >
+                      {roomIdCopied ? 'Copied!' : 'Copy'}
+                    </button>
+                    {typeof navigator.share === 'function' && (
+                      <button
+                        onClick={async () => {
+                          const link = `${window.location.origin}/join/${currentRoom?.id ?? ''}`;
+                          try {
+                            await (navigator as unknown as { share: (d: ShareData) => Promise<void> }).share({
+                              title: 'Join my Candid room',
+                              text: `Join room ${currentRoom?.id}`,
+                              url: link,
+                            });
+                          } catch {
+                            // user cancelled — ignore
+                          }
+                        }}
+                        className="btn-ghost btn-sm text-wabi-700 hover:text-wabi-800"
+                      >
+                        Share
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <code className="text-heading-md font-mono tracking-widest text-surface-900 bg-white px-4 py-3 rounded-lg border border-surface-200 block w-full text-center select-all">
                   {currentRoom?.id}
                 </code>
+                {shareNote && <p className="text-caption text-center text-surface-500 mt-3" aria-live="polite">{shareNote}</p>}
               </div>
 
               <InvitePanel roomId={waitingRoomId} />
