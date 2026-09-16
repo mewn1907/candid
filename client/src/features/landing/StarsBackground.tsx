@@ -10,6 +10,8 @@ interface Star {
   twinklePhase: number;
   vx: number;
   vy: number;
+  zigAmp: number;
+  zigSpeed: number;
   isCross: boolean;
 }
 
@@ -43,8 +45,10 @@ export const StarsBackground: React.FC = () => {
       baseAlpha: Math.random() * 0.45 + 0.4,
       twinkleSpeed: Math.random() * 0.022 + 0.008,
       twinklePhase: Math.random() * Math.PI * 2,
-      vx: (Math.random() - 0.5) * 0.18,
-      vy: -(Math.random() * 0.28 + 0.1), // More floating upward
+      vx: (Math.random() - 0.5) * 0.22,
+      vy: (Math.random() - 0.55) * 0.32, // zig-zag: some up, some down — not only upwards
+      zigAmp: Math.random() * 0.9 + 0.4,
+      zigSpeed: Math.random() * 0.0018 + 0.0007,
       isCross: Math.random() > 0.72 // ~28% are 4-point shining cross stars
     }));
 
@@ -74,23 +78,30 @@ export const StarsBackground: React.FC = () => {
 
     const render = () => {
       ctx.clearRect(0, 0, width, height);
+      const now = performance.now();
 
       for (const s of stars) {
         s.twinklePhase += s.twinkleSpeed;
         const alpha = s.baseAlpha + Math.sin(s.twinklePhase) * 0.25;
         const clampedAlpha = Math.max(0.1, Math.min(1, alpha));
 
-        // Motion update — floating with gentle tail
-        s.x += s.vx;
-        s.y += s.vy;
-        if (s.y < -10) s.y = height + 10;
-        if (s.x < -10) s.x = width + 10;
-        if (s.x > width + 10) s.x = -10;
+        // Zig-zag drift — sine wave horizontal + gentle vertical, not only upwards
+        const zigX = Math.sin(now * s.zigSpeed + s.twinklePhase) * s.zigAmp;
+        const zigY = Math.cos(now * s.zigSpeed * 0.7 + s.twinklePhase * 0.6) * s.zigAmp * 0.35;
+        const mx = s.vx + zigX * 0.08;
+        const my = s.vy + zigY * 0.08;
+        s.x += mx;
+        s.y += my;
+        // soft wrap with margin
+        if (s.y < -14) s.y = height + 14;
+        if (s.y > height + 14) s.y = -14;
+        if (s.x < -14) s.x = width + 14;
+        if (s.x > width + 14) s.x = -14;
 
-        // Long floating tail — golden comet trail
+        // Long floating tail — golden comet trail (follows zig-zag vector)
         const tailLen = 26;
-        const tailX = s.x - s.vx * tailLen * 7;
-        const tailY = s.y - s.vy * tailLen * 7;
+        const tailX = s.x - mx * tailLen * 7;
+        const tailY = s.y - my * tailLen * 7;
         const tailGrad = ctx.createLinearGradient(tailX, tailY, s.x, s.y);
         tailGrad.addColorStop(0, 'rgba(246,197,137,0)');
         tailGrad.addColorStop(0.35, `rgba(246,197,137,${clampedAlpha * 0.18})`);
