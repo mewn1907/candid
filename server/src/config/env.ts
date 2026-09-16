@@ -60,7 +60,7 @@ export const config: ServerConfig = {
     .filter((s) => s.length > 0)
     .map(normalizeOrigin),
   logLevel: getEnv('LOG_LEVEL', 'debug'),
-  roomLimitPerIp: getEnvNumber('ROOM_LIMIT_PER_IP', 10),
+  roomLimitPerIp: getEnvNumber('ROOM_LIMIT_PER_IP', 30),
   roomExpirySeconds: getEnvNumber('ROOM_EXPIRY_SECONDS', 3600),
   maxParticipants: getEnvNumber('MAX_PARTICIPANTS', 2),
   stunServers: getEnv('STUN_SERVERS', 'stun:stun.l.google.com:19302')

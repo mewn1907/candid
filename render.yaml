@@ -21,6 +21,8 @@ services:
         value: 0.0.0.0
       - key: LOG_LEVEL
         value: info
+      - key: ROOM_LIMIT_PER_IP
+        value: 30
       - key: CORS_ORIGIN
         value: https://candid-mewn.vercel.app,https://candid-client.onrender.com
       - key: STUN_SERVERS
