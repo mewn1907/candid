@@ -2,10 +2,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeSwitcher } from '../theme';
+import { StarsBackground } from './StarsBackground';
 
 export const LandingPage: React.FC = () => {
   return (
     <div className="relative min-h-screen bg-paper-100 bg-paper-grain flex flex-col justify-between overflow-hidden">
+      <StarsBackground />
       <div className="absolute top-[-10%] left-[-10%] w-[45vw] h-[45vw] bg-clay-light/20 rounded-full blur-3xl pointer-events-none animate-pulse-soft" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-pine-light/15 rounded-full blur-3xl pointer-events-none" />
       <header className="relative z-10 w-full max-w-6xl mx-auto px-6 py-8 flex items-center justify-between">
