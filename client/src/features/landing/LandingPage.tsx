@@ -33,7 +33,7 @@ export const LandingPage: React.FC = () => {
           <span className="font-semibold text-clay hand-underline inline-block mt-1">Frames together.</span>
         </h1>
         <p className="text-lg sm:text-xl text-ink-700 max-w-xl font-normal leading-relaxed mb-10 animate-slide-up" style={{ animationDelay: '150ms' as any }}>
-          An intimate, cozy virtual photobooth built for two. Share a room link, line up your shot, sync your countdown, and capture keepsake polaroids from across the globe.
+          A cozy virtual photobooth built for two. Share a room link, line up your shot, sync your countdown, and capture fun polaroids together — from anywhere.
         </p>
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full max-w-md mb-16 animate-slide-up" style={{ animationDelay: '250ms' as any }}>
           <Link to="/create" className="btn-primary w-full sm:w-auto flex-1 text-base group">
