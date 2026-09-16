@@ -239,21 +239,23 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({ onError, onStreamR
             </div>
           </>
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center text-white">
-            <div className="w-24 h-24 rounded-full bg-white/10 flex items-center justify-center mb-6 animate-pulse-soft">
-              <svg className="w-12 h-12 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <div className="w-full h-full flex flex-col items-center justify-center p-4 sm:p-6 text-center text-white gap-3 sm:gap-4">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 flex items-center justify-center animate-pulse-soft shrink-0">
+              <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <h3 className="text-heading-md font-medium mb-2">Camera Preview</h3>
-            <p className="text-white/60 mb-8 max-w-xs text-body-md">
-              Click &ldquo;Start Camera&rdquo; to begin preview. Your camera feed will appear here.
-            </p>
+            <div className="space-y-1">
+              <h3 className="text-heading-sm sm:text-heading-md font-medium">Camera Preview</h3>
+              <p className="text-white/65 max-w-[260px] text-xs sm:text-sm leading-relaxed">
+                Tap Start to enable your camera — you’ll see yourself here
+              </p>
+            </div>
             <button
               onClick={handleStart}
               disabled={loading}
-              className="btn-primary btn-lg w-full max-w-xs animate-in"
+              className="btn-primary btn-md sm:btn-lg w-auto min-w-[160px] sm:min-w-[180px] mt-1 animate-in"
             >
               {loading ? (
                 <>
