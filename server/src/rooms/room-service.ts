@@ -83,21 +83,21 @@ export function handleJoinRoom(roomId: string, socketId: string): JoinRoomResult
     };
   }
 
-  if (room.participants.length >= config.maxParticipants) {
-    return {
-      room: null,
-      participantId: 'A',
-      success: false,
-      message: 'Room is full',
-    };
-  }
-
   const existingParticipant = room.participants.find((p) => p.socketId === socketId);
   if (existingParticipant) {
     return {
       room,
       participantId: existingParticipant.id,
       success: true,
+    };
+  }
+
+  if (room.participants.length >= config.maxParticipants) {
+    return {
+      room: null,
+      participantId: 'A',
+      success: false,
+      message: 'Room is full',
     };
   }
 
