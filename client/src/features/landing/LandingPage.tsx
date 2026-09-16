@@ -26,7 +26,7 @@ export const LandingPage: React.FC = () => {
       <main className="relative z-10 max-w-5xl mx-auto px-6 pt-4 pb-16 flex flex-col items-center text-center">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-paper-200 border border-paper-border text-xs text-ink-700 mb-8 animate-fade-in shadow-cozy-sm">
           <svg className="w-3.5 h-3.5 text-clay" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 2l2.4 4.8L20 9.2l-4 3.9.9 5.4L12 16l-4.9 2.5.9-5.4L4 9.2l5.6-1.4L12 2z" /></svg>
-          <span>Private for two — instant & real-time</span>
+          <span>For two — instant & real-time</span>
         </div>
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-display font-light text-ink-900 tracking-tight leading-[1.08] max-w-3xl mb-6 animate-slide-up">
           Miles apart. <br />
