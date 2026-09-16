@@ -153,7 +153,7 @@ export interface WebRTCIceCandidatePayload {
 
 export type CaptureState = 'idle' | 'preparing' | 'countdown' | 'capturing' | 'composing' | 'result' | 'gallery';
 
-export type PhotoFilterId = 'natural' | 'sepia' | 'mono' | 'warm';
+export type PhotoFilterId = 'natural' | 'sepia' | 'mono' | 'warm' | 'clarendon' | 'gingham' | 'moon' | 'lark' | 'reyes' | 'juno' | 'valencia' | 'xpro';
 
 export type CaptureErrorCode =
   | 'CAPTURE_TIMEOUT'

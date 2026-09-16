@@ -41,7 +41,7 @@ export const WebRTCIceCandidatePayloadSchema = z.object({
   }),
 });
 
-export const PhotoFilterSchema = z.enum(['natural', 'sepia', 'mono', 'warm']);
+export const PhotoFilterSchema = z.enum(['natural', 'sepia', 'mono', 'warm', 'clarendon', 'gingham', 'moon', 'lark', 'reyes', 'juno', 'valencia', 'xpro']);
 
 export const CapturePreparePayloadSchema = z.object({
   roomId: RoomIdSchema,
