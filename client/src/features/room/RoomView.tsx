@@ -71,12 +71,13 @@ export const RoomView: React.FC = () => {
   );
 
   useEffect(() => {
-    if (roomId) {
-      joinRoom(roomId).catch(() => {
-        navigate('/', { replace: true });
-      });
-    }
-  }, [roomId, joinRoom, navigate]);
+    if (!roomId) return;
+    // Creator already has this room from createRoom() — don't re-join as duplicate
+    if (currentRoom?.id === roomId) return;
+    joinRoom(roomId).catch(() => {
+      navigate('/', { replace: true });
+    });
+  }, [roomId, currentRoom?.id, joinRoom, navigate]);
 
   useEffect(() => {
     if (webrtcHookError) {
