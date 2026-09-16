@@ -65,9 +65,9 @@ export const PhotoEditor: React.FC<PhotoEditorProps> = ({ src, onSave, onClose }
 
   return (
     <div className="fixed inset-0 z-50 bg-surface-950/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in">
-      <div className="bg-white rounded-2xl shadow-xl border border-surface-200 w-full max-w-2xl overflow-hidden">
+      <div className="bg-white rounded-xl shadow-lg border border-surface-200 w-full max-w-2xl overflow-hidden">
         <div className="p-4 border-b border-surface-200 flex items-center justify-between">
-          <h3 className="text-heading-sm font-semibold text-surface-900">Quick edit</h3>
+          <h3 className="text-heading-sm font-medium text-surface-900">Quick edit</h3>
           <button onClick={onClose} className="btn-ghost btn-sm" aria-label="Close editor">✕</button>
         </div>
         <div className="p-4 space-y-4">

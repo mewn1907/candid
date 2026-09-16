@@ -395,7 +395,7 @@ export const RoomView: React.FC = () => {
                         <p className="text-body-sm text-surface-600">{burstProgress}</p>
                       )}
                       {countdownDisplay !== null ? (
-                        <p className="text-display-md font-bold text-wabi-700 tabular-nums">{countdownDisplay}</p>
+                        <p className="text-display-md font-light text-wabi-700 tabular-nums">{countdownDisplay}</p>
                       ) : null}
                     </div>
                   </div>
@@ -418,7 +418,7 @@ export const RoomView: React.FC = () => {
               {captureState === 'result' && composedImage && (
                 <div className="space-y-6 animate-in">
                   <h3 className="text-heading-md font-semibold text-surface-900 text-center">Your Candid Photo</h3>
-                  <div className="relative w-full max-w-lg mx-auto aspect-square bg-surface-900 rounded-2xl overflow-hidden shadow-xl border border-surface-800">
+                  <div className="relative w-full max-w-lg mx-auto aspect-square bg-surface-900 rounded-xl overflow-hidden shadow-lg border border-surface-700/30">
                     <img
                       src={displaySingle!}
                       alt="Your Candid photo - two participants side by side with Candid branding"
@@ -537,7 +537,7 @@ export const RoomView: React.FC = () => {
               {captureState === 'gallery' && burstImages.length > 0 && (
                 <div className="space-y-6 animate-in">
                   <h3 className="text-heading-md font-semibold text-surface-900 text-center">Pick your favorite</h3>
-                  <div className="relative w-full max-w-lg mx-auto aspect-square bg-surface-900 rounded-2xl overflow-hidden shadow-xl border border-surface-800">
+                  <div className="relative w-full max-w-lg mx-auto aspect-square bg-surface-900 rounded-xl overflow-hidden shadow-lg border border-surface-700/30">
                     <img
                       src={displayBurstSrc}
                       alt={`Burst shot ${selectedGalleryIndex + 1} of ${burstImages.length}`}
@@ -698,7 +698,7 @@ export const RoomView: React.FC = () => {
 
                     {collageImage && (
                       <div className="space-y-4 animate-in">
-                        <div className="relative w-full max-w-lg mx-auto rounded-2xl overflow-hidden shadow-xl border border-surface-200 bg-white">
+                        <div className="relative w-full max-w-lg mx-auto rounded-xl overflow-hidden shadow-lg border border-surface-200 bg-white">
                           <img
                             src={displayCollage!}
                             alt={`Collage — ${collageChoice} layout with ${burstImages.length} shots`}

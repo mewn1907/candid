@@ -391,6 +391,8 @@ export function useCapture(
   // Burst driver: stash happens in the compose effect above. On the final
   // shot both sides enter the gallery; otherwise only participant A fires
   // the next prepare (B follows via broadcast) to avoid double-prepares.
+  // NOTE: plan/emits happen inside the timeout — updating state first would
+  // re-render, run this cleanup, and cancel our own advance.
   useEffect(() => {
     if (state !== 'result' || !burstPlan) return;
     if (burstPlan.index >= burstPlan.total) {
@@ -399,8 +401,9 @@ export function useCapture(
     }
     if (localParticipantId !== 'A') return;
     const next = { index: burstPlan.index + 1, total: burstPlan.total };
-    setBurstPlan(next);
     advanceTimeoutRef.current = setTimeout(() => {
+      advanceTimeoutRef.current = null;
+      setBurstPlan(next);
       emitPrepare(next.index, next.total);
     }, 1200);
     return () => {
